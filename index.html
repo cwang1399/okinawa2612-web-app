@@ -68,6 +68,16 @@
             padding: 0.75rem 1rem; color: #555150; transition: all 0.2s;
         }
         .ins-input:focus { outline: none; border-color: #B8A394; box-shadow: 0 0 0 3px rgba(184, 163, 148, 0.2); }
+
+        /* ====== 手機端拖曳專用防護 ====== */
+        .drag-handle { 
+            touch-action: none; /* 徹底阻斷在把手上滑動造成的手勢衝突 */
+        }
+        .sortable-fallback {
+            opacity: 0.9 !important;
+            box-shadow: 0 15px 30px rgba(85, 81, 80, 0.15) !important;
+            z-index: 9999 !important;
+        }
     </style>
 </head>
 <body class="font-sans antialiased pb-24 selection:bg-rose selection:text-white">
@@ -240,7 +250,7 @@
 
         <!-- ==================== 共用 Modals ==================== -->
         
-        <!-- 🇯🇵 求生日文 Modal (帶點擊放大功能) -->
+        <!-- 🇯🇵 求生日文 Modal -->
         <div id="modal-jp" class="fixed inset-0 bg-coffee/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
             <div class="bg-cream w-full max-w-sm rounded-3xl p-6 shadow-2xl modal-enter relative">
                 <button onclick="closeModal('modal-jp')" class="absolute top-4 right-4 text-taupe text-xl p-2 active:scale-90 transition"><i class="fas fa-times"></i></button>
@@ -331,6 +341,7 @@
                 <div class="space-y-3 max-h-[70vh] overflow-y-auto hide-scrollbar pb-2">
                     <a href="tel:110" class="block w-full bg-white p-4 rounded-2xl shadow-sm text-center font-bold text-coffee border border-[#E5E0DA] active:bg-rose active:text-white transition"><i class="fas fa-phone-alt mr-2"></i>報警 (110)</a>
                     <a href="tel:119" class="block w-full bg-white p-4 rounded-2xl shadow-sm text-center font-bold text-coffee border border-[#E5E0DA] active:bg-rose active:text-white transition"><i class="fas fa-ambulance mr-2"></i>救護車/消防 (119)</a>
+                    
                     <div class="bg-[#F0EBE6] p-4 rounded-2xl mt-4">
                         <h4 class="text-sm font-bold text-coffee mb-1"><i class="fas fa-landmark text-rose mr-1"></i>駐那霸辦事處急難救助</h4>
                         <p class="text-xs text-taupe mb-3 leading-tight">依所在位置與手機門號選擇撥打：</p>
@@ -426,12 +437,12 @@
 
     <!-- ====== JavaScript 邏輯 ====== -->
     <script>
-        // ==========================================
-        // 📦 核心資料與防撞區塊 (Sealed)
-        // ==========================================
+        // ------------------------------------------
+        // 核心資料狀態管理
+        // ------------------------------------------
         const APP_KEY = 'insTravelApp';
         const EX_RATE = 0.21;
-        const APP_VERSION = '3.0'; // 進入 3.0 封存穩定架構
+        const APP_VERSION = '3.0'; // 穩定鎖定版
 
         const TRIP_DATES = Object.freeze([
             { id: '12-22', label: 'Tue 22' }, { id: '12-23', label: 'Wed 23' }, { id: '12-24', label: 'Thu 24' },
@@ -494,7 +505,7 @@
             currentDateId: TRIP_DATES[0].id, 
             dates: TRIP_DATES, 
             itinerary: defaultItinerary, 
-            expenses: [], memo: '', shopping: [], taxMemo: '', 
+            expenses: [], memo: '', shopping:[], taxMemo: '', 
             todos:[ 
                 { id: 1, text: '護照 (效期6個月以上)', done: false, category: 'carry' }, 
                 { id: 2, text: '日幣現金與信用卡', done: false, category: 'carry' },
@@ -503,7 +514,6 @@
             ]
         });
 
-        // 絕對深拷貝，保障原資料永遠不被污染
         let appData = JSON.parse(JSON.stringify(defaultState));
 
         try {
@@ -512,7 +522,6 @@
                 const parsed = JSON.parse(savedStr);
                 if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
                     if (parsed.version !== APP_VERSION) {
-                        console.log("偵測到版本更新，載入全新的安全預設。");
                         localStorage.setItem(APP_KEY, JSON.stringify(appData));
                     } else {
                         appData = { ...appData, ...parsed };
@@ -529,11 +538,11 @@
 
         function saveData(key, value) {
             if(key) appData[key] = value;
-            try { localStorage.setItem(APP_KEY, JSON.stringify(appData)); } catch (err) { console.warn("Save Error", err); }
+            try { localStorage.setItem(APP_KEY, JSON.stringify(appData)); } catch (err) {}
         }
 
         // ==========================================
-        // 📦 模組封存區 (Sealed Modules)
+        // 📦 模組區 (Sealed Modules)
         // ==========================================
         
         // --- 🏠 HomeModule ---
@@ -767,9 +776,17 @@
                     }
                     el.innerHTML = html; container.appendChild(el);
                 });
+                
+                // 📱 手機端拖曳解決方案 (延遲觸發 + 關閉原生拖曳)
                 if (typeof Sortable !== 'undefined') {
                     new Sortable(container, {
-                        handle: '.drag-handle', animation: 150, ghostClass: 'opacity-50',
+                        handle: '.drag-handle', 
+                        animation: 150, 
+                        ghostClass: 'opacity-50',
+                        delay: 150,               // 關鍵：長按 150ms 才能拖，防止滑動衝突
+                        delayOnTouchOnly: true,   // 關鍵：只在手機端啟用延遲
+                        forceFallback: true,      // 關鍵：強制用自訂效果，避開 Safari 原生 Bug
+                        fallbackClass: 'sortable-fallback',
                         onEnd: (evt) => {
                             const newArr = []; container.querySelectorAll('[data-id]').forEach(el => { newArr.push(items.find(i => i.id === el.dataset.id)); });
                             appData.itinerary[appData.currentDateId] = newArr; saveData(); TripModule.renderItinerary();
@@ -962,7 +979,7 @@
         function closeModal(id) { const el = document.getElementById(id); if(el) el.classList.add('hidden'); }
 
         // ------------------------------------------
-        // 核心啟動區 (Master Boot)
+        // 啟動程序
         // ------------------------------------------
         window.addEventListener('load', function() {
             try {
@@ -972,9 +989,8 @@
                 ListModule.init();
                 
                 switchTab('home');
-
             } catch (err) { 
-                console.error("系統啟動發生嚴重錯誤:", err); 
+                console.error("系統啟動發生錯誤:", err); 
             }
         });
     </script>
