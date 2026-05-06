@@ -240,20 +240,89 @@
 
         <!-- ==================== 共用 Modals ==================== -->
         
-        <!-- 求生日文 Modal (已更新所有實用句子) -->
+        <!-- 🇯🇵 求生日文 Modal (整合全螢幕點擊功能) -->
         <div id="modal-jp" class="fixed inset-0 bg-coffee/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
             <div class="bg-cream w-full max-w-sm rounded-3xl p-6 shadow-2xl modal-enter relative">
-                <button onclick="closeModal('modal-jp')" class="absolute top-4 right-4 text-taupe text-xl"><i class="fas fa-times"></i></button>
-                <h3 class="text-lg font-bold text-coffee mb-4">🇯🇵 實用求生日文</h3>
-                <div class="space-y-4 max-h-[60vh] overflow-y-auto hide-scrollbar pr-2">
-                    <div class="border-b border-taupe/20 pb-2"><p class="font-bold text-rose text-sm">請問這個多少錢？</p><p class="text-coffee font-medium">Kore wa ikura desu ka?</p><p class="text-xs text-taupe">これはいくらですか？</p></div>
-                    <div class="border-b border-taupe/20 pb-2"><p class="font-bold text-rose text-sm">請問廁所在哪裡？</p><p class="text-coffee font-medium">Toire wa doko desu ka?</p><p class="text-xs text-taupe">トイレはどこですか？</p></div>
-                    <div class="border-b border-taupe/20 pb-2"><p class="font-bold text-rose text-sm">不好意思，請問最近的醫院在哪裡？</p><p class="text-coffee font-medium">sumimasen, ichiban chikai byōin wa dokodesuka.</p><p class="text-xs text-taupe">すみません、一番近い病院はどこですか。</p></div>
-                    <div class="border-b border-taupe/20 pb-2"><p class="font-bold text-rose text-sm">哪裡有說中文的醫院？</p><p class="text-coffee font-medium">Chūgokugo ga tsūjiru byōin wa doko desu ka?</p><p class="text-xs text-taupe">中国語が通じる病院はどこですか？</p></div>
-                    <div class="border-b border-taupe/20 pb-2"><p class="font-bold text-rose text-sm">我發燒了</p><p class="text-coffee font-medium">Netsu ga arimasu</p><p class="text-xs text-taupe">熱があります</p></div>
-                    <div class="border-b border-taupe/20 pb-2"><p class="font-bold text-rose text-sm">請叫救護車</p><p class="text-coffee font-medium">Kyuukyuusha wo yonde kudasai</p><p class="text-xs text-taupe">救急車を呼んでください</p></div>
-                    <div class="pb-2"><p class="font-bold text-rose text-sm">請幫我聯絡警察</p><p class="text-coffee font-medium">Keisatsu wo yonde kudasai</p><p class="text-xs text-taupe">警察を呼んでください</p></div>
+                <button onclick="closeModal('modal-jp')" class="absolute top-4 right-4 text-taupe text-xl p-2 active:scale-90 transition"><i class="fas fa-times"></i></button>
+                <h3 class="text-lg font-bold text-coffee mb-3"><i class="fas fa-language text-rose mr-2"></i>實用求生日文</h3>
+                <p class="text-[10px] text-taupe mb-3"><i class="fas fa-hand-pointer mr-1"></i>點擊任何句子可以全螢幕放大顯示！</p>
+                
+                <div class="space-y-2 max-h-[60vh] overflow-y-auto hide-scrollbar pr-1 pb-4">
+                    <!-- 購物與用餐 -->
+                    <div class="border-b border-taupe/20 pb-3 active:bg-rose/10 -mx-2 px-2 py-2 rounded-xl transition cursor-pointer" onclick="showFullScreenJp('請問這個多少錢？', 'これはいくらですか？', 'Kore wa ikura desu ka?')">
+                        <p class="font-bold text-rose text-sm">請問這個多少錢？</p>
+                        <p class="text-coffee font-medium">Kore wa ikura desu ka?</p>
+                        <p class="text-xs text-taupe">これはいくらですか？</p>
+                    </div>
+                    <div class="border-b border-taupe/20 pb-3 active:bg-rose/10 -mx-2 px-2 py-2 rounded-xl transition cursor-pointer" onclick="showFullScreenJp('請問廁所在哪裡？', 'トイレはどこですか？', 'Toire wa doko desu ka?')">
+                        <p class="font-bold text-rose text-sm">請問廁所在哪裡？</p>
+                        <p class="text-coffee font-medium">Toire wa doko desu ka?</p>
+                        <p class="text-xs text-taupe">トイレはどこですか？</p>
+                    </div>
+                    <div class="border-b border-taupe/20 pb-3 active:bg-rose/10 -mx-2 px-2 py-2 rounded-xl transition cursor-pointer" onclick="showFullScreenJp('請問可以使用信用卡嗎？', 'クレジットカードは使えますか？', 'Kurejitto kādo wa tsukaemasu ka?')">
+                        <p class="font-bold text-rose text-sm">請問可以使用信用卡嗎？</p>
+                        <p class="text-coffee font-medium">Kurejitto kādo wa tsukaemasu ka?</p>
+                        <p class="text-xs text-taupe">クレジットカードは使えますか？</p>
+                    </div>
+                    <div class="border-b border-taupe/20 pb-3 active:bg-rose/10 -mx-2 px-2 py-2 rounded-xl transition cursor-pointer" onclick="showFullScreenJp('不好意思！我要點餐。', 'すみません！注文をお願いします。', 'Sumimasen! Chūmon o onegai shimasu.')">
+                        <p class="font-bold text-rose text-sm">不好意思！(呼叫店員)我要點餐。</p>
+                        <p class="text-coffee font-medium">Sumimasen! Chūmon o onegai shimasu.</p>
+                        <p class="text-xs text-taupe">すみません！注文をお願いします。</p>
+                    </div>
+                    <div class="border-b border-taupe/20 pb-3 active:bg-rose/10 -mx-2 px-2 py-2 rounded-xl transition cursor-pointer" onclick="showFullScreenJp('請給我水。', 'お水をください。', 'O-mizu o kudasai.')">
+                        <p class="font-bold text-rose text-sm">請給我水。</p>
+                        <p class="text-coffee font-medium">O-mizu o kudasai.</p>
+                        <p class="text-xs text-taupe">お水をください。</p>
+                    </div>
+                    <div class="border-b border-taupe/20 pb-3 active:bg-rose/10 -mx-2 px-2 py-2 rounded-xl transition cursor-pointer" onclick="showFullScreenJp('我要結帳。', 'お会計をお願いします。', 'O-kaikei o onegai shimasu.')">
+                        <p class="font-bold text-rose text-sm">我要結帳。</p>
+                        <p class="text-coffee font-medium">O-kaikei o onegai shimasu.</p>
+                        <p class="text-xs text-taupe">お会計をお願いします。</p>
+                    </div>
+                    <div class="border-b border-taupe/20 pb-3 active:bg-rose/10 -mx-2 px-2 py-2 rounded-xl transition cursor-pointer" onclick="showFullScreenJp('請問可以分開結帳嗎？', '別々でお願いします。', 'Betsu-betsu de onegai shimasu.')">
+                        <p class="font-bold text-rose text-sm">請問可以分開結帳嗎？</p>
+                        <p class="text-coffee font-medium">Betsu-betsu de onegai shimasu.</p>
+                        <p class="text-xs text-taupe">別々でお願いします。</p>
+                    </div>
+
+                    <!-- 醫療與緊急 -->
+                    <div class="border-b border-taupe/20 pb-3 mt-4 active:bg-rose/10 -mx-2 px-2 py-2 rounded-xl transition cursor-pointer" onclick="showFullScreenJp('請問最近的醫院在哪裡？', '一番近い病院はどこですか。', 'Ichiban chikai byōin wa doko desu ka?')">
+                        <p class="font-bold text-rose text-sm">不好意思，請問最近的醫院在哪裡？</p>
+                        <p class="text-coffee font-medium">Sumimasen, ichiban chikai byōin wa doko desu ka?</p>
+                        <p class="text-xs text-taupe">すみません、一番近い病院はどこですか。</p>
+                    </div>
+                    <div class="border-b border-taupe/20 pb-3 active:bg-rose/10 -mx-2 px-2 py-2 rounded-xl transition cursor-pointer" onclick="showFullScreenJp('哪裡有說中文的醫院？', '中国語が通じる病院はどこですか？', 'Chūgokugo ga tsūjiru byōin wa doko desu ka?')">
+                        <p class="font-bold text-rose text-sm">哪裡有說中文的醫院？</p>
+                        <p class="text-coffee font-medium">Chūgokugo ga tsūjiru byōin wa doko desu ka?</p>
+                        <p class="text-xs text-taupe">中国語が通じる病院はどこですか？</p>
+                    </div>
+                    <div class="border-b border-taupe/20 pb-3 active:bg-rose/10 -mx-2 px-2 py-2 rounded-xl transition cursor-pointer" onclick="showFullScreenJp('我發燒了', '熱があります', 'Netsu ga arimasu')">
+                        <p class="font-bold text-rose text-sm">我發燒了</p>
+                        <p class="text-coffee font-medium">Netsu ga arimasu</p>
+                        <p class="text-xs text-taupe">熱があります</p>
+                    </div>
+                    <div class="border-b border-taupe/20 pb-3 active:bg-rose/10 -mx-2 px-2 py-2 rounded-xl transition cursor-pointer" onclick="showFullScreenJp('請叫救護車', '救急車を呼んでください', 'Kyuukyuusha o yonde kudasai')">
+                        <p class="font-bold text-rose text-sm">請叫救護車</p>
+                        <p class="text-coffee font-medium">Kyuukyuusha o yonde kudasai</p>
+                        <p class="text-xs text-taupe">救急車を呼んでください</p>
+                    </div>
+                    <div class="pb-3 active:bg-rose/10 -mx-2 px-2 py-2 rounded-xl transition cursor-pointer" onclick="showFullScreenJp('請幫我聯絡警察', '警察を呼んでください', 'Keisatsu o yonde kudasai')">
+                        <p class="font-bold text-rose text-sm">請幫我聯絡警察</p>
+                        <p class="text-coffee font-medium">Keisatsu o yonde kudasai</p>
+                        <p class="text-xs text-taupe">警察を呼んでください</p>
+                    </div>
                 </div>
+            </div>
+        </div>
+
+        <!-- 🇯🇵 點擊後全螢幕放大 Modal -->
+        <div id="modal-jp-fullscreen" class="fixed inset-0 bg-coffee/95 backdrop-blur-md z-[60] hidden flex items-center justify-center p-6">
+            <div class="bg-cream w-full max-w-sm rounded-3xl p-8 shadow-2xl modal-enter relative text-center flex flex-col justify-center items-center min-h-[40vh] border-4 border-rose/20">
+                <button onclick="closeModal('modal-jp-fullscreen')" class="absolute top-3 right-4 text-taupe text-3xl p-2 active:scale-90 transition"><i class="fas fa-times"></i></button>
+                <div class="w-12 h-1 bg-rose/30 rounded-full mb-6"></div>
+                <p id="fs-jp-zh" class="font-bold text-rose text-lg mb-2"></p>
+                <p id="fs-jp-ja" class="text-coffee font-bold text-3xl leading-tight mb-4 tracking-wide"></p>
+                <p id="fs-jp-ro" class="text-taupe font-medium text-lg"></p>
             </div>
         </div>
 
@@ -584,6 +653,14 @@
             preview.innerHTML = htmlText || '<span class="text-taupe">預覽區...</span>';
         }
 
+        // 🚀 新增：觸發日文滿版全螢幕功能
+        function showFullScreenJp(zh, ja, ro) {
+            document.getElementById('fs-jp-zh').innerText = zh;
+            document.getElementById('fs-jp-ja').innerText = ja;
+            document.getElementById('fs-jp-ro').innerText = ro;
+            openModal('modal-jp-fullscreen');
+        }
+
         // ------------------------------------------
         // 🧳 TRIP 行程模組
         // ------------------------------------------
@@ -692,7 +769,7 @@
                     new Sortable(container, {
                         handle: '.drag-handle', animation: 150, ghostClass: 'opacity-50',
                         onEnd: (evt) => {
-                            const newArr =[]; container.querySelectorAll('[data-id]').forEach(el => { newArr.push(items.find(i => i.id === el.dataset.id)); });
+                            const newArr = []; container.querySelectorAll('[data-id]').forEach(el => { newArr.push(items.find(i => i.id === el.dataset.id)); });
                             appData.itinerary[appData.currentDateId] = newArr; saveData(); TripModule.renderItinerary();
                         }
                     });
@@ -858,7 +935,7 @@
         function closeModal(id) { const el = document.getElementById(id); if(el) el.classList.add('hidden'); }
 
         // ------------------------------------------
-        // 安全啟動程序 (使用 Load 確保完全不卡死)
+        // 啟動程序
         // ------------------------------------------
         window.addEventListener('load', function() {
             try {
@@ -866,7 +943,6 @@
                 WalletModule.init(); 
                 ListModule.init();
                 
-                // 強制初始化首頁並載入狀態
                 switchHomeMode(appData.homeMode || 'entry');
                 
                 const hn = document.getElementById('hotel-name'); if(hn) hn.value = appData.hotelName || '';
@@ -877,7 +953,7 @@
                 switchTab('home');
 
             } catch (err) { 
-                console.error("啟動發生嚴重錯誤:", err); 
+                console.error("初始化發生嚴重錯誤:", err); 
             }
         });
     </script>
