@@ -127,18 +127,21 @@
             </div>
         </section>
 
-        <!-- ==================== 2. 行程 (TRIP 封包區) ==================== -->
+        <!-- ==================== 2. 行程 (TRIP) ==================== -->
         <section id="tab-itinerary" class="p-5 space-y-4 tab-content hidden flex-col h-full">
             <h2 class="text-2xl font-bold font-num text-coffee pt-4 mb-2">Itinerary</h2>
+            
             <div class="flex overflow-x-auto gap-3 pb-2 hide-scrollbar snap-x" id="date-slider"></div>
+
             <div class="flex justify-between items-center mt-2">
                 <span class="text-sm font-bold text-taupe" id="current-date-display"></span>
                 <button onclick="TripModule.openModal()" class="bg-coffee text-white px-4 py-1.5 rounded-full text-sm font-bold shadow-md active:scale-95 transition"><i class="fas fa-plus mr-1"></i>新增</button>
             </div>
+
             <div id="itinerary-list" class="space-y-4 pb-10 min-h-[50vh]"></div>
         </section>
 
-        <!-- ==================== 3. 記帳與匯率 (WALLET 封包區) ==================== -->
+        <!-- ==================== 3. 記帳與匯率 (WALLET) ==================== -->
         <section id="tab-wallet" class="p-5 space-y-6 tab-content hidden relative min-h-[85vh]">
             <h2 class="text-2xl font-bold font-num text-coffee pt-4">Wallet</h2>
             
@@ -177,11 +180,10 @@
             </div>
         </section>
 
-        <!-- ==================== 4. 清單 (LISTS 封包區) ==================== -->
+        <!-- ==================== 4. 清單 (LISTS) ==================== -->
         <section id="tab-lists" class="p-5 space-y-6 tab-content hidden pb-20">
             <h2 class="text-2xl font-bold font-num text-coffee pt-4">Lists</h2>
             
-            <!-- 區塊1: 行前準備 -->
             <div class="bg-cream p-5 rounded-3xl shadow-soft">
                 <h3 class="font-bold text-coffee mb-4"><i class="fas fa-check-square text-rose mr-2"></i>行前準備</h3>
                 <div class="flex gap-2 mb-4 bg-[#F0EBE6] p-1 rounded-2xl">
@@ -196,7 +198,6 @@
                 <div id="todo-list" class="space-y-2"></div>
             </div>
 
-            <!-- 區塊2: 購物清單 -->
             <div class="bg-cream p-5 rounded-3xl shadow-soft">
                 <h3 class="font-bold text-coffee mb-4"><i class="fas fa-shopping-bag text-rose mr-2"></i>購物清單</h3>
                 <div class="space-y-3 mb-5">
@@ -216,7 +217,6 @@
                 <div id="shopping-list" class="space-y-3"></div>
             </div>
 
-            <!-- 區塊3: 個人備忘錄 -->
             <div class="bg-cream p-5 rounded-3xl shadow-soft">
                 <h3 class="font-bold text-coffee mb-4"><i class="fas fa-book-open text-rose mr-2"></i>個人備忘錄</h3>
                 <p class="text-xs text-taupe mb-2">輸入網址會自動變成按鈕喔！</p>
@@ -242,6 +242,7 @@
         </nav>
 
         <!-- ==================== 共用 Modals ==================== -->
+        <!-- 求生日文 Modal (已更新) -->
         <div id="modal-jp" class="fixed inset-0 bg-coffee/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
             <div class="bg-cream w-full max-w-sm rounded-3xl p-6 shadow-2xl modal-enter relative">
                 <button onclick="closeModal('modal-jp')" class="absolute top-4 right-4 text-taupe text-xl"><i class="fas fa-times"></i></button>
@@ -249,11 +250,15 @@
                 <div class="space-y-4 max-h-[60vh] overflow-y-auto hide-scrollbar pr-2">
                     <div class="border-b border-taupe/20 pb-2"><p class="font-bold text-rose text-sm">請問這個多少錢？</p><p class="text-coffee font-medium">Kore wa ikura desu ka?</p><p class="text-xs text-taupe">これはいくらですか？</p></div>
                     <div class="border-b border-taupe/20 pb-2"><p class="font-bold text-rose text-sm">請問廁所在哪裡？</p><p class="text-coffee font-medium">Toire wa doko desu ka?</p><p class="text-xs text-taupe">トイレはどこですか？</p></div>
+                    <div class="border-b border-taupe/20 pb-2"><p class="font-bold text-rose text-sm">請問可以使用信用卡嗎？</p><p class="text-coffee font-medium">Kurejitto kādo wa tsukaemasu ka?</p><p class="text-xs text-taupe">クレジットカードは使えますか？</p></div>
+                    <div class="border-b border-taupe/20 pb-2"><p class="font-bold text-rose text-sm">不好意思！(呼叫店員)我要點餐。</p><p class="text-coffee font-medium">Sumimasen! Chūmon o onegai shimasu.</p><p class="text-xs text-taupe">すみません！注文をお願いします。</p></div>
+                    <div class="border-b border-taupe/20 pb-2"><p class="font-bold text-rose text-sm">請給我水。</p><p class="text-coffee font-medium">O-mizu o kudasai.</p><p class="text-xs text-taupe">お水をください。</p></div>
+                    <div class="border-b border-taupe/20 pb-2"><p class="font-bold text-rose text-sm">我要結帳。</p><p class="text-coffee font-medium">O-kaikei o onegai shimasu.</p><p class="text-xs text-taupe">お会計をお願いします。</p></div>
+                    <div class="pb-2"><p class="font-bold text-rose text-sm">請問可以分開結帳嗎？</p><p class="text-coffee font-medium">Betsu-betsu de onegai shimasu.</p><p class="text-xs text-taupe">別々でお願いします。</p></div>
                 </div>
             </div>
         </div>
 
-        <!-- 🚨 緊急聯絡 Modal (新增那霸辦事處) -->
         <div id="modal-sos" class="fixed inset-0 bg-coffee/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
             <div class="bg-cream w-full max-w-sm rounded-3xl p-6 shadow-2xl modal-enter relative">
                 <button onclick="closeModal('modal-sos')" class="absolute top-4 right-4 text-taupe text-xl"><i class="fas fa-times"></i></button>
@@ -262,7 +267,6 @@
                     <a href="tel:110" class="block w-full bg-white p-4 rounded-2xl shadow-sm text-center font-bold text-coffee border border-[#E5E0DA] active:bg-rose active:text-white transition"><i class="fas fa-phone-alt mr-2"></i>報警 (110)</a>
                     <a href="tel:119" class="block w-full bg-white p-4 rounded-2xl shadow-sm text-center font-bold text-coffee border border-[#E5E0DA] active:bg-rose active:text-white transition"><i class="fas fa-ambulance mr-2"></i>救護車/消防 (119)</a>
                     
-                    <!-- 駐那霸辦事處 區塊 -->
                     <div class="bg-[#F0EBE6] p-4 rounded-2xl mt-4">
                         <h4 class="text-sm font-bold text-coffee mb-1"><i class="fas fa-landmark text-rose mr-1"></i>駐那霸辦事處急難救助</h4>
                         <p class="text-xs text-taupe mb-3 leading-tight">依所在位置與手機門號選擇撥打：</p>
@@ -279,7 +283,6 @@
             </div>
         </div>
 
-        <!-- 退稅筆記 Modal -->
         <div id="modal-tax" class="fixed inset-0 bg-coffee/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
             <div class="bg-cream w-full max-w-sm rounded-3xl p-6 shadow-2xl modal-enter relative max-h-[90vh] overflow-y-auto hide-scrollbar">
                 <button onclick="closeModal('modal-tax')" class="absolute top-4 right-4 text-taupe text-xl"><i class="fas fa-times"></i></button>
@@ -363,7 +366,7 @@
         // ------------------------------------------
         const APP_KEY = 'insTravelApp';
         const EX_RATE = 0.21;
-        const APP_VERSION = '2.1'; // 更新版號防卡死
+        const APP_VERSION = '2.1'; 
 
         const TRIP_DATES =[
             { id: '12-22', label: 'Tue 22' }, { id: '12-23', label: 'Wed 23' }, { id: '12-24', label: 'Thu 24' },
@@ -392,15 +395,12 @@
             if (savedStr) {
                 const parsed = JSON.parse(savedStr);
                 if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
-                    // 若版本不符，重置資料防止卡死
                     if (parsed.version !== APP_VERSION) {
                         console.log("版本升級，清除舊暫存以防錯誤。");
                         localStorage.setItem(APP_KEY, JSON.stringify(defaultState));
                     } else {
                         appData = { ...defaultState, ...parsed };
-                        
                         if (appData.vjwImg && !appData.vjwImg_personal) appData.vjwImg_personal = appData.vjwImg;
-                        
                         appData.todos = Array.isArray(appData.todos) ? appData.todos : defaultState.todos;
                         appData.expenses = Array.isArray(appData.expenses) ? appData.expenses : defaultState.expenses;
                         appData.shopping = Array.isArray(appData.shopping) ? appData.shopping : defaultState.shopping;
@@ -423,7 +423,7 @@
         }
 
         // ------------------------------------------
-        // 🏠 HOME 首頁模組 (包含 VJW 新版切換功能)
+        // 🏠 HOME 首頁模組
         // ------------------------------------------
         function switchHomeMode(mode) {
             appData.homeMode = mode; saveData();
@@ -694,7 +694,7 @@
                     new Sortable(container, {
                         handle: '.drag-handle', animation: 150, ghostClass: 'opacity-50',
                         onEnd: (evt) => {
-                            const newArr = []; container.querySelectorAll('[data-id]').forEach(el => { newArr.push(items.find(i => i.id === el.dataset.id)); });
+                            const newArr =[]; container.querySelectorAll('[data-id]').forEach(el => { newArr.push(items.find(i => i.id === el.dataset.id)); });
                             appData.itinerary[appData.currentDateId] = newArr; saveData(); TripModule.renderItinerary();
                         }
                     });
@@ -860,28 +860,31 @@
         function closeModal(id) { const el = document.getElementById(id); if(el) el.classList.add('hidden'); }
 
         // ------------------------------------------
-        // 安全啟動程序 (使用 Load 確保完全不卡死)
+        // 安全啟動程序 (自帶防白畫面修復)
         // ------------------------------------------
-        window.addEventListener('load', function() {
+        function initApp() {
             try {
                 TripModule.init(); 
                 WalletModule.init(); 
                 ListModule.init();
                 
-                // 強制初始化首頁並載入狀態
                 switchHomeMode(appData.homeMode || 'entry');
                 
                 const hn = document.getElementById('hotel-name'); if(hn) hn.value = appData.hotelName || '';
                 if(appData.hotelImg) showImagePreview('hotelImg', appData.hotelImg);
                 
-                updateTaxMemo(true);
+                updateTaxMemo(true); // 啟動時載入退稅筆記
 
                 switchTab('home');
-
             } catch (err) { 
-                console.error("啟動發生嚴重錯誤:", err); 
+                console.error("初始化發生嚴重錯誤:", err); 
+                alert("讀取舊資料時發生衝突，為確保網頁正常運作，將重置您的暫存資料。");
+                localStorage.removeItem(APP_KEY);
+                location.reload();
             }
-        });
+        }
+        
+        initApp();
     </script>
 </body>
 </html>
