@@ -90,10 +90,11 @@
 
             <div class="bg-cream p-2 rounded-full shadow-soft flex relative">
                 <div id="mode-slider" class="absolute w-1/2 h-full bg-coffee rounded-full top-0 left-0 transition-transform duration-300 ease-in-out z-0 scale-y-90 scale-x-95"></div>
-                <button onclick="switchHomeMode('entry')" id="btn-mode-entry" class="flex-1 py-2 text-center text-white z-10 font-bold transition-colors">入境模式</button>
-                <button onclick="switchHomeMode('drive')" id="btn-mode-drive" class="flex-1 py-2 text-center text-coffee z-10 font-bold transition-colors">自駕模式</button>
+                <button onclick="HomeModule.switchHomeMode('entry')" id="btn-mode-entry" class="flex-1 py-2 text-center text-white z-10 font-bold transition-colors">入境模式</button>
+                <button onclick="HomeModule.switchHomeMode('drive')" id="btn-mode-drive" class="flex-1 py-2 text-center text-coffee z-10 font-bold transition-colors">自駕模式</button>
             </div>
 
+            <!-- 動態內容區 -->
             <div id="home-dynamic-content" class="space-y-6"></div>
 
             <div class="bg-cream rounded-3xl p-5 shadow-soft">
@@ -107,7 +108,6 @@
                         <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-rose shadow-sm"><i class="fas fa-phone"></i></div>
                         <span class="text-xs font-bold">緊急聯絡</span>
                     </button>
-                    <!-- 退稅工具按鈕 -->
                     <button onclick="openModal('modal-tax')" class="flex flex-col items-center gap-2 p-3 bg-[#F0EBE6] rounded-2xl active:scale-95 transition-transform">
                         <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-rose shadow-sm"><i class="fas fa-coins"></i></div>
                         <span class="text-xs font-bold">退稅</span>
@@ -119,7 +119,7 @@
                 <h3 class="font-bold text-coffee mb-4"><i class="fas fa-hotel text-rose mr-2"></i>住宿資訊</h3>
                 <input type="text" id="hotel-name" placeholder="輸入飯店名稱..." class="ins-input mb-3" onchange="saveData('hotelName', this.value)">
                 <div class="relative w-full h-32 bg-[#F0EBE6] rounded-2xl border-2 border-dashed border-taupe flex flex-col items-center justify-center overflow-hidden">
-                    <input type="file" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" onchange="handleImageUpload(event, 'hotelImg')">
+                    <input type="file" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" onchange="HomeModule.handleImageUpload(event, 'hotelImg')">
                     <div id="hotelImg-preview" class="absolute inset-0 bg-cover bg-center hidden"></div>
                     <i class="fas fa-cloud-upload-alt text-2xl text-taupe mb-1"></i>
                     <span class="text-xs text-taupe">上傳訂房憑證截圖</span>
@@ -127,7 +127,7 @@
             </div>
         </section>
 
-        <!-- ==================== 2. 行程 (TRIP 封包區) ==================== -->
+        <!-- ==================== 2. 行程 (TRIP) ==================== -->
         <section id="tab-itinerary" class="p-5 space-y-4 tab-content hidden flex-col h-full">
             <h2 class="text-2xl font-bold font-num text-coffee pt-4 mb-2">Itinerary</h2>
             <div class="flex overflow-x-auto gap-3 pb-2 hide-scrollbar snap-x" id="date-slider"></div>
@@ -138,7 +138,7 @@
             <div id="itinerary-list" class="space-y-4 pb-10 min-h-[50vh]"></div>
         </section>
 
-        <!-- ==================== 3. 記帳與匯率 (WALLET 封包區) ==================== -->
+        <!-- ==================== 3. 記帳與匯率 (WALLET) ==================== -->
         <section id="tab-wallet" class="p-5 space-y-6 tab-content hidden relative min-h-[85vh]">
             <h2 class="text-2xl font-bold font-num text-coffee pt-4">Wallet</h2>
             
@@ -177,7 +177,7 @@
             </div>
         </section>
 
-        <!-- ==================== 4. 清單 (LISTS 封包區) ==================== -->
+        <!-- ==================== 4. 清單 (LISTS) ==================== -->
         <section id="tab-lists" class="p-5 space-y-6 tab-content hidden pb-20">
             <h2 class="text-2xl font-bold font-num text-coffee pt-4">Lists</h2>
             
@@ -240,7 +240,7 @@
 
         <!-- ==================== 共用 Modals ==================== -->
         
-        <!-- 🇯🇵 求生日文 Modal (整合全螢幕點擊功能) -->
+        <!-- 🇯🇵 求生日文 Modal (帶點擊放大功能) -->
         <div id="modal-jp" class="fixed inset-0 bg-coffee/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
             <div class="bg-cream w-full max-w-sm rounded-3xl p-6 shadow-2xl modal-enter relative">
                 <button onclick="closeModal('modal-jp')" class="absolute top-4 right-4 text-taupe text-xl p-2 active:scale-90 transition"><i class="fas fa-times"></i></button>
@@ -248,65 +248,62 @@
                 <p class="text-[10px] text-taupe mb-3"><i class="fas fa-hand-pointer mr-1"></i>點擊任何句子可以全螢幕放大顯示！</p>
                 
                 <div class="space-y-2 max-h-[60vh] overflow-y-auto hide-scrollbar pr-1 pb-4">
-                    <!-- 購物與用餐 -->
-                    <div class="border-b border-taupe/20 pb-3 active:bg-rose/10 -mx-2 px-2 py-2 rounded-xl transition cursor-pointer" onclick="showFullScreenJp('請問這個多少錢？', 'これはいくらですか？', 'Kore wa ikura desu ka?')">
+                    <div class="border-b border-taupe/20 pb-3 active:bg-rose/10 -mx-2 px-2 py-2 rounded-xl transition cursor-pointer" onclick="HomeModule.showFullScreenJp('請問這個多少錢？', 'これはいくらですか？', 'Kore wa ikura desu ka?')">
                         <p class="font-bold text-rose text-sm">請問這個多少錢？</p>
                         <p class="text-coffee font-medium">Kore wa ikura desu ka?</p>
                         <p class="text-xs text-taupe">これはいくらですか？</p>
                     </div>
-                    <div class="border-b border-taupe/20 pb-3 active:bg-rose/10 -mx-2 px-2 py-2 rounded-xl transition cursor-pointer" onclick="showFullScreenJp('請問廁所在哪裡？', 'トイレはどこですか？', 'Toire wa doko desu ka?')">
+                    <div class="border-b border-taupe/20 pb-3 active:bg-rose/10 -mx-2 px-2 py-2 rounded-xl transition cursor-pointer" onclick="HomeModule.showFullScreenJp('請問廁所在哪裡？', 'トイレはどこですか？', 'Toire wa doko desu ka?')">
                         <p class="font-bold text-rose text-sm">請問廁所在哪裡？</p>
                         <p class="text-coffee font-medium">Toire wa doko desu ka?</p>
                         <p class="text-xs text-taupe">トイレはどこですか？</p>
                     </div>
-                    <div class="border-b border-taupe/20 pb-3 active:bg-rose/10 -mx-2 px-2 py-2 rounded-xl transition cursor-pointer" onclick="showFullScreenJp('請問可以使用信用卡嗎？', 'クレジットカードは使えますか？', 'Kurejitto kādo wa tsukaemasu ka?')">
+                    <div class="border-b border-taupe/20 pb-3 active:bg-rose/10 -mx-2 px-2 py-2 rounded-xl transition cursor-pointer" onclick="HomeModule.showFullScreenJp('請問可以使用信用卡嗎？', 'クレジットカードは使えますか？', 'Kurejitto kādo wa tsukaemasu ka?')">
                         <p class="font-bold text-rose text-sm">請問可以使用信用卡嗎？</p>
                         <p class="text-coffee font-medium">Kurejitto kādo wa tsukaemasu ka?</p>
                         <p class="text-xs text-taupe">クレジットカードは使えますか？</p>
                     </div>
-                    <div class="border-b border-taupe/20 pb-3 active:bg-rose/10 -mx-2 px-2 py-2 rounded-xl transition cursor-pointer" onclick="showFullScreenJp('不好意思！我要點餐。', 'すみません！注文をお願いします。', 'Sumimasen! Chūmon o onegai shimasu.')">
+                    <div class="border-b border-taupe/20 pb-3 active:bg-rose/10 -mx-2 px-2 py-2 rounded-xl transition cursor-pointer" onclick="HomeModule.showFullScreenJp('不好意思！我要點餐。', 'すみません！注文をお願いします。', 'Sumimasen! Chūmon o onegai shimasu.')">
                         <p class="font-bold text-rose text-sm">不好意思！(呼叫店員)我要點餐。</p>
                         <p class="text-coffee font-medium">Sumimasen! Chūmon o onegai shimasu.</p>
                         <p class="text-xs text-taupe">すみません！注文をお願いします。</p>
                     </div>
-                    <div class="border-b border-taupe/20 pb-3 active:bg-rose/10 -mx-2 px-2 py-2 rounded-xl transition cursor-pointer" onclick="showFullScreenJp('請給我水。', 'お水をください。', 'O-mizu o kudasai.')">
+                    <div class="border-b border-taupe/20 pb-3 active:bg-rose/10 -mx-2 px-2 py-2 rounded-xl transition cursor-pointer" onclick="HomeModule.showFullScreenJp('請給我水。', 'お水をください。', 'O-mizu o kudasai.')">
                         <p class="font-bold text-rose text-sm">請給我水。</p>
                         <p class="text-coffee font-medium">O-mizu o kudasai.</p>
                         <p class="text-xs text-taupe">お水をください。</p>
                     </div>
-                    <div class="border-b border-taupe/20 pb-3 active:bg-rose/10 -mx-2 px-2 py-2 rounded-xl transition cursor-pointer" onclick="showFullScreenJp('我要結帳。', 'お会計をお願いします。', 'O-kaikei o onegai shimasu.')">
+                    <div class="border-b border-taupe/20 pb-3 active:bg-rose/10 -mx-2 px-2 py-2 rounded-xl transition cursor-pointer" onclick="HomeModule.showFullScreenJp('我要結帳。', 'お会計をお願いします。', 'O-kaikei o onegai shimasu.')">
                         <p class="font-bold text-rose text-sm">我要結帳。</p>
                         <p class="text-coffee font-medium">O-kaikei o onegai shimasu.</p>
                         <p class="text-xs text-taupe">お会計をお願いします。</p>
                     </div>
-                    <div class="border-b border-taupe/20 pb-3 active:bg-rose/10 -mx-2 px-2 py-2 rounded-xl transition cursor-pointer" onclick="showFullScreenJp('請問可以分開結帳嗎？', '別々でお願いします。', 'Betsu-betsu de onegai shimasu.')">
+                    <div class="border-b border-taupe/20 pb-3 active:bg-rose/10 -mx-2 px-2 py-2 rounded-xl transition cursor-pointer" onclick="HomeModule.showFullScreenJp('請問可以分開結帳嗎？', '別々でお願いします。', 'Betsu-betsu de onegai shimasu.')">
                         <p class="font-bold text-rose text-sm">請問可以分開結帳嗎？</p>
                         <p class="text-coffee font-medium">Betsu-betsu de onegai shimasu.</p>
                         <p class="text-xs text-taupe">別々でお願いします。</p>
                     </div>
-
-                    <!-- 醫療與緊急 -->
-                    <div class="border-b border-taupe/20 pb-3 mt-4 active:bg-rose/10 -mx-2 px-2 py-2 rounded-xl transition cursor-pointer" onclick="showFullScreenJp('請問最近的醫院在哪裡？', '一番近い病院はどこですか。', 'Ichiban chikai byōin wa doko desu ka?')">
+                    <div class="border-b border-taupe/20 pb-3 mt-4 active:bg-rose/10 -mx-2 px-2 py-2 rounded-xl transition cursor-pointer" onclick="HomeModule.showFullScreenJp('請問最近的醫院在哪裡？', '一番近い病院はどこですか。', 'Ichiban chikai byōin wa doko desu ka?')">
                         <p class="font-bold text-rose text-sm">不好意思，請問最近的醫院在哪裡？</p>
                         <p class="text-coffee font-medium">Sumimasen, ichiban chikai byōin wa doko desu ka?</p>
                         <p class="text-xs text-taupe">すみません、一番近い病院はどこですか。</p>
                     </div>
-                    <div class="border-b border-taupe/20 pb-3 active:bg-rose/10 -mx-2 px-2 py-2 rounded-xl transition cursor-pointer" onclick="showFullScreenJp('哪裡有說中文的醫院？', '中国語が通じる病院はどこですか？', 'Chūgokugo ga tsūjiru byōin wa doko desu ka?')">
+                    <div class="border-b border-taupe/20 pb-3 active:bg-rose/10 -mx-2 px-2 py-2 rounded-xl transition cursor-pointer" onclick="HomeModule.showFullScreenJp('哪裡有說中文的醫院？', '中国語が通じる病院はどこですか？', 'Chūgokugo ga tsūjiru byōin wa doko desu ka?')">
                         <p class="font-bold text-rose text-sm">哪裡有說中文的醫院？</p>
                         <p class="text-coffee font-medium">Chūgokugo ga tsūjiru byōin wa doko desu ka?</p>
                         <p class="text-xs text-taupe">中国語が通じる病院はどこですか？</p>
                     </div>
-                    <div class="border-b border-taupe/20 pb-3 active:bg-rose/10 -mx-2 px-2 py-2 rounded-xl transition cursor-pointer" onclick="showFullScreenJp('我發燒了', '熱があります', 'Netsu ga arimasu')">
+                    <div class="border-b border-taupe/20 pb-3 active:bg-rose/10 -mx-2 px-2 py-2 rounded-xl transition cursor-pointer" onclick="HomeModule.showFullScreenJp('我發燒了', '熱があります', 'Netsu ga arimasu')">
                         <p class="font-bold text-rose text-sm">我發燒了</p>
                         <p class="text-coffee font-medium">Netsu ga arimasu</p>
                         <p class="text-xs text-taupe">熱があります</p>
                     </div>
-                    <div class="border-b border-taupe/20 pb-3 active:bg-rose/10 -mx-2 px-2 py-2 rounded-xl transition cursor-pointer" onclick="showFullScreenJp('請叫救護車', '救急車を呼んでください', 'Kyuukyuusha o yonde kudasai')">
+                    <div class="border-b border-taupe/20 pb-3 active:bg-rose/10 -mx-2 px-2 py-2 rounded-xl transition cursor-pointer" onclick="HomeModule.showFullScreenJp('請叫救護車', '救急車を呼んでください', 'Kyuukyuusha o yonde kudasai')">
                         <p class="font-bold text-rose text-sm">請叫救護車</p>
                         <p class="text-coffee font-medium">Kyuukyuusha o yonde kudasai</p>
                         <p class="text-xs text-taupe">救急車を呼んでください</p>
                     </div>
-                    <div class="pb-3 active:bg-rose/10 -mx-2 px-2 py-2 rounded-xl transition cursor-pointer" onclick="showFullScreenJp('請幫我聯絡警察', '警察を呼んでください', 'Keisatsu o yonde kudasai')">
+                    <div class="pb-3 active:bg-rose/10 -mx-2 px-2 py-2 rounded-xl transition cursor-pointer" onclick="HomeModule.showFullScreenJp('請幫我聯絡警察', '警察を呼んでください', 'Keisatsu o yonde kudasai')">
                         <p class="font-bold text-rose text-sm">請幫我聯絡警察</p>
                         <p class="text-coffee font-medium">Keisatsu o yonde kudasai</p>
                         <p class="text-xs text-taupe">警察を呼んでください</p>
@@ -315,7 +312,7 @@
             </div>
         </div>
 
-        <!-- 🇯🇵 點擊後全螢幕放大 Modal -->
+        <!-- 🇯🇵 全螢幕放大 Modal -->
         <div id="modal-jp-fullscreen" class="fixed inset-0 bg-coffee/95 backdrop-blur-md z-[60] hidden flex items-center justify-center p-6">
             <div class="bg-cream w-full max-w-sm rounded-3xl p-8 shadow-2xl modal-enter relative text-center flex flex-col justify-center items-center min-h-[40vh] border-4 border-rose/20">
                 <button onclick="closeModal('modal-jp-fullscreen')" class="absolute top-3 right-4 text-taupe text-3xl p-2 active:scale-90 transition"><i class="fas fa-times"></i></button>
@@ -326,6 +323,7 @@
             </div>
         </div>
 
+        <!-- 🚨 緊急聯絡 Modal -->
         <div id="modal-sos" class="fixed inset-0 bg-coffee/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
             <div class="bg-cream w-full max-w-sm rounded-3xl p-6 shadow-2xl modal-enter relative">
                 <button onclick="closeModal('modal-sos')" class="absolute top-4 right-4 text-taupe text-xl"><i class="fas fa-times"></i></button>
@@ -333,7 +331,6 @@
                 <div class="space-y-3 max-h-[70vh] overflow-y-auto hide-scrollbar pb-2">
                     <a href="tel:110" class="block w-full bg-white p-4 rounded-2xl shadow-sm text-center font-bold text-coffee border border-[#E5E0DA] active:bg-rose active:text-white transition"><i class="fas fa-phone-alt mr-2"></i>報警 (110)</a>
                     <a href="tel:119" class="block w-full bg-white p-4 rounded-2xl shadow-sm text-center font-bold text-coffee border border-[#E5E0DA] active:bg-rose active:text-white transition"><i class="fas fa-ambulance mr-2"></i>救護車/消防 (119)</a>
-                    
                     <div class="bg-[#F0EBE6] p-4 rounded-2xl mt-4">
                         <h4 class="text-sm font-bold text-coffee mb-1"><i class="fas fa-landmark text-rose mr-1"></i>駐那霸辦事處急難救助</h4>
                         <p class="text-xs text-taupe mb-3 leading-tight">依所在位置與手機門號選擇撥打：</p>
@@ -350,12 +347,13 @@
             </div>
         </div>
 
+        <!-- 💰 退稅筆記 Modal -->
         <div id="modal-tax" class="fixed inset-0 bg-coffee/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
             <div class="bg-cream w-full max-w-sm rounded-3xl p-6 shadow-2xl modal-enter relative max-h-[90vh] overflow-y-auto hide-scrollbar">
                 <button onclick="closeModal('modal-tax')" class="absolute top-4 right-4 text-taupe text-xl"><i class="fas fa-times"></i></button>
                 <h3 class="text-lg font-bold text-coffee mb-4"><i class="fas fa-coins text-rose mr-2"></i>退稅筆記</h3>
                 <p class="text-xs text-taupe mb-2">貼上退稅說明網址會自動變成按鈕喔！</p>
-                <textarea id="tax-memo-input" rows="4" class="ins-input resize-none mb-3" placeholder="隨手記下退稅資訊或網址..." oninput="updateTaxMemo()"></textarea>
+                <textarea id="tax-memo-input" rows="4" class="ins-input resize-none mb-3" placeholder="隨手記下退稅資訊或網址..." oninput="HomeModule.updateTaxMemo()"></textarea>
                 <div id="tax-memo-preview" class="p-4 bg-[#F0EBE6] rounded-2xl text-sm leading-relaxed min-h-[4rem] whitespace-pre-wrap break-words"></div>
             </div>
         </div>
@@ -397,8 +395,8 @@
 
         <!-- ==================== WALLET 專用 Modal ==================== -->
         <div id="modal-expense" class="fixed inset-0 bg-coffee/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-            <div class="bg-cream w-full max-w-sm rounded-3xl p-6 shadow-2xl modal-enter relative max-h-[90vh] overflow-y-auto hide-scrollbar">
-                <h3 class="text-lg font-bold text-coffee mb-4"><i class="fas fa-pen text-rose mr-2"></i>記一筆花費</h3>
+            <div class="bg-cream w-full max-w-sm rounded-3xl p-6 shadow-2xl modal-enter relative max-h-[90vh] overflow-y-auto hide-scrollbar pb-10">
+                <h3 class="text-lg font-bold text-coffee mb-4" id="expense-modal-title"><i class="fas fa-pen text-rose mr-2"></i>記一筆花費</h3>
                 <p class="text-xs font-bold text-coffee mb-2">消費日期</p>
                 <div id="expense-date-slider" class="flex overflow-x-auto gap-2 pb-2 hide-scrollbar snap-x mb-4"></div>
                 <div class="space-y-3">
@@ -418,7 +416,7 @@
                     </div>
                     <div class="flex gap-3 pt-2">
                         <button type="button" onclick="closeModal('modal-expense')" class="flex-1 bg-white border border-[#E5E0DA] text-coffee py-3 rounded-2xl font-bold">取消</button>
-                        <button type="button" onclick="WalletModule.addExpense()" class="flex-1 bg-coffee text-white py-3 rounded-2xl font-bold shadow-md">加入帳單</button>
+                        <button type="button" onclick="WalletModule.saveExpense()" class="flex-1 bg-coffee text-white py-3 rounded-2xl font-bold shadow-md">儲存</button>
                     </div>
                 </div>
             </div>
@@ -428,34 +426,85 @@
 
     <!-- ====== JavaScript 邏輯 ====== -->
     <script>
-        // ------------------------------------------
-        // 核心資料狀態管理與極致防撞網
-        // ------------------------------------------
+        // ==========================================
+        // 📦 核心資料與防撞區塊 (Sealed)
+        // ==========================================
         const APP_KEY = 'insTravelApp';
         const EX_RATE = 0.21;
-        const APP_VERSION = '2.1'; 
+        const APP_VERSION = '3.0'; // 進入 3.0 封存穩定架構
 
-        const TRIP_DATES =[
+        const TRIP_DATES = Object.freeze([
             { id: '12-22', label: 'Tue 22' }, { id: '12-23', label: 'Wed 23' }, { id: '12-24', label: 'Thu 24' },
             { id: '12-25', label: 'Fri 25' }, { id: '12-26', label: 'Sat 26' }, { id: '12-27', label: 'Sun 27' }
-        ];
+        ]);
 
-        const defaultState = {
+        const defaultItinerary = Object.freeze({
+            '12-22':[
+                { id: '1222-1', type: '航班', name: '台中機場', time: '11:00', note: '預計13:15搭乘', transMethod: '飛機', transTime: '1hr30min', mapUrl: 'https://maps.app.goo.gl/sLDTFYSPMrEzCFG49' },
+                { id: '1222-2', type: '航班', name: '那霸機場', time: '15:45', transMethod: '電車', transTime: '15min', mapUrl: 'https://maps.app.goo.gl/G68qQxNwecwdyrad9' },
+                { id: '1222-3', type: '住宿', name: 'Hotel Aqua Citta Naha', time: '18:00', note: '住宿費12/16提前支付￥55,499', transMethod: '步行', transTime: '16min', mapUrl: 'https://maps.app.goo.gl/xRfaHBjcSEuhxGNt7' },
+                { id: '1222-4', type: '美食', name: '泡盛と沖縄料理 龍泉 地下蔵店', time: '11:00-23:00', transMethod: '步行', transTime: '6min', mapUrl: 'https://maps.app.goo.gl/4w8rRsiexGLMbBfm7' },
+                { id: '1222-5', type: '購物', name: 'ドン・キホーテ 国際通り店', time: '09:00-05:00', transMethod: '步行', transTime: '6min', mapUrl: 'https://maps.app.goo.gl/QTsZGAGLG4f3qNFY8' },
+                { id: '1222-6', type: '美食', name: '真夜中スイーツ 国際通り店', time: '10:00-01:00', transMethod: '步行', transTime: '15min', mapUrl: 'https://maps.app.goo.gl/rLCRYzHpWSqnWbVF6' },
+                { id: '1222-7', type: '購物', name: 'マックスバリュ牧志店', time: '24小時', note: '退稅櫃台只到20:00', transMethod: '步行', transTime: '15min', mapUrl: 'https://maps.app.goo.gl/adRsMxjp2PQgwHJG7' }
+            ],
+            '12-23':[
+                { id: '1223-1', type: '美食', name: '泊いゆまち', time: '07:00-18:00', transMethod: '步行', transTime: '15min', mapUrl: 'https://maps.app.goo.gl/imsxLC4eh1yjD3oq7' },
+                { id: '1223-2', type: '住宿', name: 'Hotel Aqua Citta Naha', note: '12:00取車', transMethod: '汽車', transTime: '6min', mapUrl: 'https://maps.app.goo.gl/xRfaHBjcSEuhxGNt7' },
+                { id: '1223-3', type: '景點', name: '波上宮', time: '09:00-17:00', note: '汽車停放在若狭海浜公園駐車場\nhttps://maps.app.goo.gl/nxGRikkcNiZ4ZMYR9', transMethod: '汽車', transTime: '24min', mapUrl: 'https://maps.app.goo.gl/PCBXosANX2616wGK6' },
+                { id: '1223-4', type: '美食', name: 'egg me time.', time: '12:00-15:00 18:00-21:00', transMethod: '汽車', transTime: '24min', mapUrl: 'https://maps.app.goo.gl/mwUMRNdBzwwm2oez5' },
+                { id: '1223-5', type: '購物', name: 'イーアス沖縄豊崎', time: '10:00-21:00', transMethod: '汽車', transTime: '10min', mapUrl: 'https://maps.app.goo.gl/DVHXD3r3oTYLupmA6' },
+                { id: '1223-6', type: '景點', name: '瀨長島', time: '10:00-20:00', transMethod: '步行', transTime: '5min', mapUrl: 'https://maps.app.goo.gl/rtuj9ydRE6Fyz4mH7' },
+                { id: '1223-7', type: '美食', name: 'Taco Rice Cafe Kijimuna', time: '11:00-21:00', transMethod: '汽車', transTime: '22min', mapUrl: 'https://maps.app.goo.gl/ZrDcbmLWhAyPQRu17' }
+            ],
+            '12-24':[
+                { id: '1224-1', type: '景點', name: 'DMM かりゆし水族館', time: '09:00-19:00', transMethod: '汽車', transTime: '6min', mapUrl: 'https://maps.app.goo.gl/DJP41oTrsg8Qkhsu6' },
+                { id: '1224-2', type: '美食', name: '玉家 豊崎店', time: '11:00-17:00(週二休)', transMethod: '汽車', transTime: '30min', mapUrl: 'https://maps.app.goo.gl/J4B7Y61U9McXpeZP7' },
+                { id: '1224-3', type: '購物', name: '第一牧志公設市場', time: '08:00-22:00', transMethod: '汽車', transTime: '24min', mapUrl: 'https://maps.app.goo.gl/t45jsWDUFghRcTmQA' },
+                { id: '1224-4', type: '購物', name: 'PARCO CITY', time: '10:00-22:00', transMethod: '汽車', transTime: '45min', mapUrl: 'https://maps.app.goo.gl/WwydVGCgbu1puH9h8' },
+                { id: '1224-5', type: '住宿', name: 'Minato Chatan Seaside Condominium', time: '15:00過後', note: '住宿費12/14提前支付￥109,618', transMethod: '步行', transTime: '15min', mapUrl: 'https://maps.app.goo.gl/aRVvVgrQG9mCgaby6' },
+                { id: '1224-6', type: '景點', name: '美國村', time: '10:00-22:00', transMethod: '步行', transTime: '15min', mapUrl: 'https://maps.app.goo.gl/EArQcZRvQs3SfSFt5' }
+            ],
+            '12-25':[
+                { id: '1225-1', type: '景點', name: '古宇利海洋塔', time: '10:00-18:00', transMethod: '汽車', transTime: '40min', mapUrl: 'https://maps.app.goo.gl/z4whqjfobsHuyByT7' },
+                { id: '1225-2', type: '美食', name: '紀乃川食堂', time: '11:00-17:30(週日休)', transMethod: '汽車', transTime: '15min', mapUrl: 'https://maps.app.goo.gl/eJgw7TjcpqUFurKo6' },
+                { id: '1225-3', type: '景點', name: '沖縄美ら海水族館', time: '08:30-18:30', transMethod: '汽車', transTime: '40min', mapUrl: 'https://maps.app.goo.gl/mbULKU9EHfAQkZqM8' },
+                { id: '1225-4', type: '美食', name: '肉割烹にく久 名護店', time: '17:00-23:30', transMethod: '汽車', transTime: '60min', mapUrl: 'https://maps.app.goo.gl/FG9mpne35pDvd1k87' }
+            ],
+            '12-26':[
+                { id: '1226-1', type: '景點', name: '沖縄こどもの国', time: '09:30-21:00', note: '', transMethod: '汽車', transTime: '30min', mapUrl: 'https://maps.app.goo.gl/nmTVT3kVmPKex11S8' },
+                { id: '1226-2', type: '美食', name: '聚楽苑', time: '12:00-22:00', transMethod: '汽車', transTime: '30min', mapUrl: 'https://maps.app.goo.gl/sY2PAwhhfbZbmqRt9' },
+                { id: '1226-3', type: '購物', name: 'AEON MALL Okinawa Rycom', time: '10:00-22:00', transMethod: '汽車', transTime: '20min', mapUrl: 'https://maps.app.goo.gl/ENjazi3XtiUu7JFq6' },
+                { id: '1226-4', type: '購物', name: 'MEGAドン・キホーテ 宜野湾店', time: '09:00-05:00', transMethod: '汽車', transTime: '20min', mapUrl: 'https://maps.app.goo.gl/Vret4S8fQFH8AUEi6' }
+            ],
+            '12-27':[
+                { id: '1227-1', type: '美食', name: 'Wake & Make - Seaside Morning cafe', time: '08:00-16:00', transMethod: '汽車', transTime: '10min', mapUrl: 'https://maps.app.goo.gl/tADp9fe7Wk3aWtxi9' },
+                { id: '1227-2', type: '景點', name: '安良波公園', time: '07:00-22:00', transMethod: '', transTime: '', mapUrl: 'https://maps.app.goo.gl/5kz9nrDbgNUGZ6f68' },
+                { id: '1227-3', type: '美食', name: 'A&W 牧港店', time: '06:00-02:00', transMethod: '汽車', transTime: '30min', mapUrl: 'https://maps.app.goo.gl/Jh9W5KsyoRFB68kh9' },
+                { id: '1227-4', type: '航班', name: '那霸機場', time: '12:45', note: '預計搭乘16:45航班', transMethod: '飛機', transTime: '1hr50min', mapUrl: 'https://maps.app.goo.gl/G68qQxNwecwdyrad9' },
+                { id: '1227-5', type: '航班', name: '台中機場', time: '17:35', transMethod: '', transTime: '', mapUrl: 'https://maps.app.goo.gl/sLDTFYSPMrEzCFG49' }
+            ]
+        });
+
+        const defaultState = Object.freeze({
             version: APP_VERSION,
             homeMode: 'entry', 
             vjwMember: 'personal', vjwImg_personal: '', vjwImg_child: '',
             parkingImg: '', hotelName: '', hotelImg: '',
-            currentDateId: TRIP_DATES[0].id, dates: TRIP_DATES, itinerary: {}, expenses:[], memo: '', shopping:[],
-            taxMemo: '', 
+            currentDateId: TRIP_DATES[0].id, 
+            dates: TRIP_DATES, 
+            itinerary: defaultItinerary, 
+            expenses: [], memo: '', shopping: [], taxMemo: '', 
             todos:[ 
                 { id: 1, text: '護照 (效期6個月以上)', done: false, category: 'carry' }, 
                 { id: 2, text: '日幣現金與信用卡', done: false, category: 'carry' },
                 { id: 3, text: '行動電源 (不可托運)', done: false, category: 'cabin' },
                 { id: 4, text: '換洗衣物', done: false, category: 'checked' }
             ]
-        };
+        });
 
-        let appData = { ...defaultState };
+        // 絕對深拷貝，保障原資料永遠不被污染
+        let appData = JSON.parse(JSON.stringify(defaultState));
 
         try {
             const savedStr = localStorage.getItem(APP_KEY);
@@ -463,211 +512,167 @@
                 const parsed = JSON.parse(savedStr);
                 if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
                     if (parsed.version !== APP_VERSION) {
-                        console.log("版本升級，清除舊暫存以防錯誤。");
-                        localStorage.setItem(APP_KEY, JSON.stringify(defaultState));
+                        console.log("偵測到版本更新，載入全新的安全預設。");
+                        localStorage.setItem(APP_KEY, JSON.stringify(appData));
                     } else {
-                        appData = { ...defaultState, ...parsed };
-                        if (appData.vjwImg && !appData.vjwImg_personal) appData.vjwImg_personal = appData.vjwImg;
-                        appData.todos = Array.isArray(appData.todos) ? appData.todos : defaultState.todos;
-                        appData.expenses = Array.isArray(appData.expenses) ? appData.expenses : defaultState.expenses;
-                        appData.shopping = Array.isArray(appData.shopping) ? appData.shopping : defaultState.shopping;
-                        appData.itinerary = (typeof appData.itinerary === 'object' && appData.itinerary !== null) ? appData.itinerary : defaultState.itinerary;
+                        appData = { ...appData, ...parsed };
+                        appData.todos = Array.isArray(appData.todos) ? appData.todos : JSON.parse(JSON.stringify(defaultState.todos));
+                        appData.expenses = Array.isArray(appData.expenses) ? appData.expenses :[];
+                        appData.shopping = Array.isArray(appData.shopping) ? appData.shopping :[];
+                        appData.itinerary = (typeof appData.itinerary === 'object' && appData.itinerary !== null) ? appData.itinerary : JSON.parse(JSON.stringify(defaultState.itinerary));
                     }
                 }
             }
         } catch (e) {
-            console.error("Storage Error, resetting defaults.");
-            appData = { ...defaultState };
+            console.error("Storage Error, resetting securely.");
         }
 
         function saveData(key, value) {
             if(key) appData[key] = value;
-            try {
-                localStorage.setItem(APP_KEY, JSON.stringify(appData));
-            } catch (err) {
-                console.warn("Save Error (Storage full?)", err);
-            }
+            try { localStorage.setItem(APP_KEY, JSON.stringify(appData)); } catch (err) { console.warn("Save Error", err); }
         }
 
-        // ------------------------------------------
-        // 🏠 HOME 首頁模組
-        // ------------------------------------------
-        function switchHomeMode(mode) {
-            appData.homeMode = mode; saveData();
-            const slider = document.getElementById('mode-slider');
-            const btnEntry = document.getElementById('btn-mode-entry'); 
-            const btnDrive = document.getElementById('btn-mode-drive');
-            const content = document.getElementById('home-dynamic-content');
+        // ==========================================
+        // 📦 模組封存區 (Sealed Modules)
+        // ==========================================
+        
+        // --- 🏠 HomeModule ---
+        const HomeModule = {
+            init: function() {
+                this.switchHomeMode(appData.homeMode || 'entry');
+                const hn = document.getElementById('hotel-name'); if(hn) hn.value = appData.hotelName || '';
+                if(appData.hotelImg) this.showImagePreview('hotelImg', appData.hotelImg);
+                this.updateTaxMemo(true);
+            },
+            switchHomeMode: function(mode) {
+                appData.homeMode = mode; saveData();
+                const slider = document.getElementById('mode-slider');
+                const btnEntry = document.getElementById('btn-mode-entry'); 
+                const btnDrive = document.getElementById('btn-mode-drive');
+                const content = document.getElementById('home-dynamic-content');
+                if (!content) return; 
 
-            if (!content) return; 
-
-            if(mode === 'entry') {
-                if(slider) slider.style.transform = 'translateX(0)';
-                if(btnEntry) btnEntry.className = 'flex-1 py-2 text-center text-white z-10 font-bold transition-colors';
-                if(btnDrive) btnDrive.className = 'flex-1 py-2 text-center text-coffee z-10 font-bold transition-colors';
-                
-                const member = appData.vjwMember || 'personal';
-
-                content.innerHTML = `
-                    <div class="bg-cream rounded-3xl p-5 shadow-soft space-y-4">
-                        <div class="flex justify-between items-center">
-                            <h3 class="font-bold text-coffee"><i class="fas fa-qrcode text-rose mr-2"></i>Visit Japan Web</h3>
-                            <a href="https://www.vjw.digital.go.jp/main/#/vjwplo001" target="_blank" class="text-[11px] font-bold text-rose bg-rose/10 px-3 py-1.5 rounded-full shadow-sm flex items-center gap-1 active:scale-95 transition">
-                                <i class="fas fa-external-link-alt"></i> 官網連結
-                            </a>
-                        </div>
-                        
-                        <div class="flex gap-2 bg-[#F0EBE6] p-1 rounded-2xl">
-                            <button onclick="switchVjwMember('personal')" id="btn-vjw-personal" class="flex-1 py-1.5 text-sm font-bold rounded-xl transition">個人</button>
-                            <button onclick="switchVjwMember('child')" id="btn-vjw-child" class="flex-1 py-1.5 text-sm font-bold rounded-xl transition">小孩</button>
-                        </div>
-
-                        <div class="relative w-full h-56 bg-[#F0EBE6] rounded-2xl border-2 border-dashed border-taupe flex flex-col items-center justify-center overflow-hidden">
-                            <input type="file" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" onchange="handleVjwUpload(event)">
-                            <div id="vjwImg-preview" class="absolute inset-0 bg-contain bg-no-repeat bg-center hidden z-0"></div>
-                            <div id="vjw-upload-placeholder" class="flex flex-col items-center justify-center pointer-events-none z-0">
-                                <i class="fas fa-camera text-3xl text-taupe mb-2"></i>
-                                <span class="text-sm text-taupe font-bold">點擊上傳 <span id="vjw-member-label" class="text-rose">個人</span> QR Code</span>
+                if(mode === 'entry') {
+                    if(slider) slider.style.transform = 'translateX(0)';
+                    if(btnEntry) btnEntry.className = 'flex-1 py-2 text-center text-white z-10 font-bold transition-colors';
+                    if(btnDrive) btnDrive.className = 'flex-1 py-2 text-center text-coffee z-10 font-bold transition-colors';
+                    const member = appData.vjwMember || 'personal';
+                    content.innerHTML = `
+                        <div class="bg-cream rounded-3xl p-5 shadow-soft space-y-4">
+                            <div class="flex justify-between items-center">
+                                <h3 class="font-bold text-coffee"><i class="fas fa-qrcode text-rose mr-2"></i>Visit Japan Web</h3>
+                                <a href="https://www.vjw.digital.go.jp/main/#/vjwplo001" target="_blank" class="text-[11px] font-bold text-rose bg-rose/10 px-3 py-1.5 rounded-full shadow-sm flex items-center gap-1 active:scale-95 transition">
+                                    <i class="fas fa-external-link-alt"></i> 官網連結
+                                </a>
+                            </div>
+                            <div class="flex gap-2 bg-[#F0EBE6] p-1 rounded-2xl">
+                                <button onclick="HomeModule.switchVjwMember('personal')" id="btn-vjw-personal" class="flex-1 py-1.5 text-sm font-bold rounded-xl transition">個人</button>
+                                <button onclick="HomeModule.switchVjwMember('child')" id="btn-vjw-child" class="flex-1 py-1.5 text-sm font-bold rounded-xl transition">小孩</button>
+                            </div>
+                            <div class="relative w-full h-56 bg-[#F0EBE6] rounded-2xl border-2 border-dashed border-taupe flex flex-col items-center justify-center overflow-hidden">
+                                <input type="file" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" onchange="HomeModule.handleVjwUpload(event)">
+                                <div id="vjwImg-preview" class="absolute inset-0 bg-contain bg-no-repeat bg-center hidden z-0"></div>
+                                <div id="vjw-upload-placeholder" class="flex flex-col items-center justify-center pointer-events-none z-0">
+                                    <i class="fas fa-camera text-3xl text-taupe mb-2"></i>
+                                    <span class="text-sm text-taupe font-bold">點擊上傳 <span id="vjw-member-label" class="text-rose">個人</span> QR Code</span>
+                                </div>
+                            </div>
+                        </div>`;
+                    this.switchVjwMember(member);
+                } else {
+                    if(slider) slider.style.transform = 'translateX(100%)';
+                    if(btnDrive) btnDrive.className = 'flex-1 py-2 text-center text-white z-10 font-bold transition-colors';
+                    if(btnEntry) btnEntry.className = 'flex-1 py-2 text-center text-coffee z-10 font-bold transition-colors';
+                    content.innerHTML = `
+                        <div class="bg-cream rounded-3xl p-5 shadow-soft mb-4">
+                            <h3 class="font-bold text-coffee mb-4"><i class="fas fa-car text-rose mr-2"></i>停車位置筆記</h3>
+                            <div class="relative w-full h-40 bg-[#F0EBE6] rounded-2xl border-2 border-dashed border-taupe flex flex-col items-center justify-center overflow-hidden">
+                                <input type="file" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" onchange="HomeModule.handleImageUpload(event, 'parkingImg')">
+                                <div id="parkingImg-preview" class="absolute inset-0 bg-cover bg-center hidden"></div>
+                                <i class="fas fa-parking text-3xl text-taupe mb-2"></i>
+                                <span class="text-sm text-taupe font-bold">拍下車位號碼</span>
                             </div>
                         </div>
-                    </div>`;
-                    
-                switchVjwMember(member);
-
-            } else {
-                if(slider) slider.style.transform = 'translateX(100%)';
-                if(btnDrive) btnDrive.className = 'flex-1 py-2 text-center text-white z-10 font-bold transition-colors';
-                if(btnEntry) btnEntry.className = 'flex-1 py-2 text-center text-coffee z-10 font-bold transition-colors';
-                
-                content.innerHTML = `
-                    <div class="bg-cream rounded-3xl p-5 shadow-soft mb-4">
-                        <h3 class="font-bold text-coffee mb-4"><i class="fas fa-car text-rose mr-2"></i>停車位置筆記</h3>
-                        <div class="relative w-full h-40 bg-[#F0EBE6] rounded-2xl border-2 border-dashed border-taupe flex flex-col items-center justify-center overflow-hidden">
-                            <input type="file" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" onchange="handleImageUpload(event, 'parkingImg')">
-                            <div id="parkingImg-preview" class="absolute inset-0 bg-cover bg-center hidden"></div>
-                            <i class="fas fa-parking text-3xl text-taupe mb-2"></i>
-                            <span class="text-sm text-taupe font-bold">拍下車位號碼</span>
-                        </div>
-                    </div>
-                    <div class="bg-rose/10 border border-rose/20 rounded-3xl p-5 shadow-inner-soft">
-                        <h3 class="font-bold text-coffee mb-2"><i class="fas fa-info-circle text-rose mr-2"></i>日本自駕口訣</h3>
-                        <ul class="text-sm text-coffee/80 space-y-2 list-disc pl-5 font-bold">
-                            <li>靠左行駛，駕駛座在右邊。</li>
-                            <li><span class="text-rose">左小右大</span>：左轉轉小彎，右轉轉大彎。</li>
-                            <li>雨刷在左，方向燈在右。</li>
-                            <li>遇到「止まれ」標誌務必<span class="text-rose">完全停止3秒</span>。</li>
-                        </ul>
-                    </div>`;
-                if(appData.parkingImg) showImagePreview('parkingImg', appData.parkingImg);
-            }
-        }
-
-        function switchVjwMember(member) {
-            appData.vjwMember = member; saveData();
-            const btnP = document.getElementById('btn-vjw-personal');
-            const btnC = document.getElementById('btn-vjw-child');
-            const label = document.getElementById('vjw-member-label');
-            const preview = document.getElementById('vjwImg-preview');
-            const placeholder = document.getElementById('vjw-upload-placeholder');
-
-            if(member === 'personal') {
-                if(btnP) btnP.className = 'flex-1 py-1.5 text-sm font-bold rounded-xl bg-white text-coffee shadow-sm transition';
-                if(btnC) btnC.className = 'flex-1 py-1.5 text-sm font-bold rounded-xl text-taupe transition';
-            } else {
-                if(btnP) btnP.className = 'flex-1 py-1.5 text-sm font-bold rounded-xl text-taupe transition';
-                if(btnC) btnC.className = 'flex-1 py-1.5 text-sm font-bold rounded-xl bg-white text-coffee shadow-sm transition';
-            }
-            if(label) label.innerText = (member === 'personal') ? '個人' : '小孩';
-
-            const currentImg = appData['vjwImg_' + member];
-            if(preview && placeholder) {
-                if(currentImg) {
-                    preview.style.backgroundImage = `url(${currentImg})`;
-                    preview.classList.remove('hidden');
-                    placeholder.classList.add('hidden');
-                } else {
-                    preview.classList.add('hidden');
-                    preview.style.backgroundImage = '';
-                    placeholder.classList.remove('hidden');
+                        <div class="bg-rose/10 border border-rose/20 rounded-3xl p-5 shadow-inner-soft">
+                            <h3 class="font-bold text-coffee mb-2"><i class="fas fa-info-circle text-rose mr-2"></i>日本自駕口訣</h3>
+                            <ul class="text-sm text-coffee/80 space-y-2 list-disc pl-5 font-bold">
+                                <li>靠左行駛，駕駛座在右邊。</li>
+                                <li><span class="text-rose">左小右大</span>：左轉轉小彎，右轉轉大彎。</li>
+                                <li>雨刷在左，方向燈在右。</li>
+                                <li>遇到「止まれ」標誌務必<span class="text-rose">完全停止3秒</span>。</li>
+                            </ul>
+                        </div>`;
+                    if(appData.parkingImg) this.showImagePreview('parkingImg', appData.parkingImg);
                 }
-            }
-        }
-
-        function handleVjwUpload(event) {
-            const file = event.target.files[0]; if(!file) return;
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const img = new Image();
-                img.onload = function() {
-                    const canvas = document.createElement('canvas');
-                    const MAX_WIDTH = 600; let width = img.width; let height = img.height;
-                    if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
-                    canvas.width = width; canvas.height = height;
-                    const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, width, height);
-                    const dataUrl = canvas.toDataURL('image/jpeg', 0.6);
-                    
-                    const member = appData.vjwMember || 'personal';
-                    appData['vjwImg_' + member] = dataUrl; saveData();
-                    
-                    const preview = document.getElementById('vjwImg-preview');
-                    const placeholder = document.getElementById('vjw-upload-placeholder');
-                    if(preview && placeholder) {
-                        preview.style.backgroundImage = `url(${dataUrl})`;
-                        preview.classList.remove('hidden'); placeholder.classList.add('hidden');
+            },
+            switchVjwMember: function(member) {
+                appData.vjwMember = member; saveData();
+                const btnP = document.getElementById('btn-vjw-personal'); const btnC = document.getElementById('btn-vjw-child');
+                const label = document.getElementById('vjw-member-label'); const preview = document.getElementById('vjwImg-preview');
+                const placeholder = document.getElementById('vjw-upload-placeholder');
+                if(member === 'personal') {
+                    if(btnP) btnP.className = 'flex-1 py-1.5 text-sm font-bold rounded-xl bg-white text-coffee shadow-sm transition';
+                    if(btnC) btnC.className = 'flex-1 py-1.5 text-sm font-bold rounded-xl text-taupe transition';
+                } else {
+                    if(btnP) btnP.className = 'flex-1 py-1.5 text-sm font-bold rounded-xl text-taupe transition';
+                    if(btnC) btnC.className = 'flex-1 py-1.5 text-sm font-bold rounded-xl bg-white text-coffee shadow-sm transition';
+                }
+                if(label) label.innerText = (member === 'personal') ? '個人' : '小孩';
+                const currentImg = appData['vjwImg_' + member];
+                if(preview && placeholder) {
+                    if(currentImg) {
+                        preview.style.backgroundImage = `url(${currentImg})`; preview.classList.remove('hidden'); placeholder.classList.add('hidden');
+                    } else {
+                        preview.classList.add('hidden'); preview.style.backgroundImage = ''; placeholder.classList.remove('hidden');
                     }
-                }; img.src = e.target.result;
-            }; reader.readAsDataURL(file);
-        }
+                }
+            },
+            handleVjwUpload: function(event) {
+                const file = event.target.files[0]; if(!file) return; const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = new Image(); img.onload = () => {
+                        const canvas = document.createElement('canvas'); const MAX_WIDTH = 600; let width = img.width; let height = img.height;
+                        if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
+                        canvas.width = width; canvas.height = height; const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, width, height);
+                        const dataUrl = canvas.toDataURL('image/jpeg', 0.6);
+                        const member = appData.vjwMember || 'personal'; appData['vjwImg_' + member] = dataUrl; saveData();
+                        const preview = document.getElementById('vjwImg-preview'); const placeholder = document.getElementById('vjw-upload-placeholder');
+                        if(preview && placeholder) { preview.style.backgroundImage = `url(${dataUrl})`; preview.classList.remove('hidden'); placeholder.classList.add('hidden'); }
+                    }; img.src = e.target.result;
+                }; reader.readAsDataURL(file);
+            },
+            handleImageUpload: function(event, key) {
+                const file = event.target.files[0]; if(!file) return; const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = new Image(); img.onload = () => {
+                        const canvas = document.createElement('canvas'); const MAX_WIDTH = 600; let width = img.width; let height = img.height;
+                        if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
+                        canvas.width = width; canvas.height = height; const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, width, height);
+                        const dataUrl = canvas.toDataURL('image/jpeg', 0.6); appData[key] = dataUrl; saveData(); this.showImagePreview(key, dataUrl);
+                    }; img.src = e.target.result;
+                }; reader.readAsDataURL(file);
+            },
+            showImagePreview: function(key, dataUrl) { 
+                const el = document.getElementById(`${key}-preview`); if(el) { el.style.backgroundImage = `url(${dataUrl})`; el.classList.remove('hidden'); } 
+            },
+            updateTaxMemo: function(init = false) {
+                const mInput = document.getElementById('tax-memo-input'); const preview = document.getElementById('tax-memo-preview');
+                if(!mInput || !preview) return;
+                if(init) { mInput.value = appData.taxMemo || ''; } else { appData.taxMemo = mInput.value; saveData(); }
+                const htmlText = (appData.taxMemo || '').replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/(https?:\/\/[^\s]+)/g, url => `<br><a href="${url}" target="_blank" class="inline-flex items-center mt-1 px-4 py-1.5 bg-rose text-white rounded-full text-xs shadow-sm font-bold active:scale-95 transition"><i class="fas fa-link mr-1"></i> 開啟連結</a><br>`);
+                preview.innerHTML = htmlText || '<span class="text-taupe">預覽區...</span>';
+            },
+            showFullScreenJp: function(zh, ja, ro) {
+                document.getElementById('fs-jp-zh').innerText = zh; document.getElementById('fs-jp-ja').innerText = ja; document.getElementById('fs-jp-ro').innerText = ro;
+                openModal('modal-jp-fullscreen');
+            }
+        };
 
-        function handleImageUpload(event, key) {
-            const file = event.target.files[0]; if(!file) return;
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const img = new Image();
-                img.onload = function() {
-                    const canvas = document.createElement('canvas');
-                    const MAX_WIDTH = 600; let width = img.width; let height = img.height;
-                    if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
-                    canvas.width = width; canvas.height = height;
-                    const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, width, height);
-                    const dataUrl = canvas.toDataURL('image/jpeg', 0.6);
-                    appData[key] = dataUrl; saveData(); showImagePreview(key, dataUrl);
-                }; img.src = e.target.result;
-            }; reader.readAsDataURL(file);
-        }
-        
-        function showImagePreview(key, dataUrl) { 
-            const el = document.getElementById(`${key}-preview`); 
-            if(el) { el.style.backgroundImage = `url(${dataUrl})`; el.classList.remove('hidden'); } 
-        }
-
-        function updateTaxMemo(init = false) {
-            const mInput = document.getElementById('tax-memo-input'); 
-            const preview = document.getElementById('tax-memo-preview');
-            if(!mInput || !preview) return;
-            if(init) { mInput.value = appData.taxMemo || ''; } else { appData.taxMemo = mInput.value; saveData(); }
-            
-            const rawText = appData.taxMemo || '';
-            const escapedText = rawText.replace(/</g, "&lt;").replace(/>/g, "&gt;");
-            const htmlText = escapedText.replace(/(https?:\/\/[^\s]+)/g, url => `<br><a href="${url}" target="_blank" class="inline-flex items-center mt-1 px-4 py-1.5 bg-rose text-white rounded-full text-xs shadow-sm font-bold active:scale-95 transition"><i class="fas fa-link mr-1"></i> 開啟連結</a><br>`);
-            preview.innerHTML = htmlText || '<span class="text-taupe">預覽區...</span>';
-        }
-
-        // 🚀 新增：觸發日文滿版全螢幕功能
-        function showFullScreenJp(zh, ja, ro) {
-            document.getElementById('fs-jp-zh').innerText = zh;
-            document.getElementById('fs-jp-ja').innerText = ja;
-            document.getElementById('fs-jp-ro').innerText = ro;
-            openModal('modal-jp-fullscreen');
-        }
-
-        // ------------------------------------------
-        // 🧳 TRIP 行程模組
-        // ------------------------------------------
+        // --- 🧳 TripModule ---
         const TripModule = {
             currentTransMethod: '', editingItiId: null,
             init: function() {
-                appData.dates = TRIP_DATES;
+                appData.dates = appData.dates || TRIP_DATES;
                 if(!appData.dates.find(d => d.id === appData.currentDateId)) appData.currentDateId = appData.dates[0].id;
                 this.renderDateSlider(); this.renderItinerary();
             },
@@ -684,12 +689,9 @@
             renderDateSlider: function() {
                 const container = document.getElementById('date-slider'); container.innerHTML = '';
                 appData.dates.forEach(d => {
-                    const isActive = appData.currentDateId === d.id;
-                    const btn = document.createElement('button');
+                    const isActive = appData.currentDateId === d.id; const btn = document.createElement('button');
                     btn.className = `flex-shrink-0 px-4 py-2 rounded-2xl font-num font-bold text-sm transition shadow-sm ${isActive ? 'bg-coffee text-white' : 'bg-cream text-taupe border border-[#E5E0DA]'}`;
-                    btn.innerText = d.label;
-                    btn.onclick = () => { appData.currentDateId = d.id; saveData(); this.renderDateSlider(); this.renderItinerary(); };
-                    container.appendChild(btn);
+                    btn.innerText = d.label; btn.onclick = () => { appData.currentDateId = d.id; saveData(); this.renderDateSlider(); this.renderItinerary(); }; container.appendChild(btn);
                 });
                 const activeDate = appData.dates.find(d => d.id === appData.currentDateId);
                 const disp = document.getElementById('current-date-display'); if(disp) disp.innerText = activeDate ? activeDate.label : '';
@@ -777,12 +779,10 @@
             }
         };
 
-        // ------------------------------------------
-        // 💰 WALLET 記帳模組
-        // ------------------------------------------
+        // --- 💰 WalletModule ---
         const WalletModule = {
-            currentExpenseDateId: null,
-            init: function() { this.currentExpenseDateId = appData.currentDateId || TRIP_DATES[0].id; this.renderExpenses(); },
+            currentExpenseDateId: null, editingExpId: null,
+            init: function() { this.currentExpenseDateId = appData.currentDateId || appData.dates[0].id; this.renderExpenses(); },
             convertCurrency: function(source) {
                 const jpyEl = document.getElementById('calc-jpy'); const twdEl = document.getElementById('calc-twd');
                 if(source === 'jpy') { twdEl.value = isNaN(parseFloat(jpyEl.value)) ? '' : Math.round(parseFloat(jpyEl.value) * EX_RATE); }
@@ -790,25 +790,46 @@
             },
             renderDateSlider: function() {
                 const container = document.getElementById('expense-date-slider'); if(!container) return; container.innerHTML = '';
-                TRIP_DATES.forEach(d => {
+                appData.dates.forEach(d => {
                     const isActive = this.currentExpenseDateId === d.id; const btn = document.createElement('button'); btn.type = 'button';
                     btn.className = `flex-shrink-0 px-4 py-1.5 rounded-2xl font-num font-bold text-xs transition shadow-sm ${isActive ? 'bg-rose text-white' : 'bg-white text-taupe border border-[#E5E0DA]'}`;
                     btn.innerText = d.label; btn.onclick = () => { this.currentExpenseDateId = d.id; this.renderDateSlider(); }; container.appendChild(btn);
                 });
             },
             openModal: function() {
+                this.editingExpId = null; 
+                const titleEl = document.getElementById('expense-modal-title'); if (titleEl) titleEl.innerHTML = '<i class="fas fa-pen text-rose mr-2"></i>記一筆花費';
                 document.getElementById('exp-item').value = ''; document.getElementById('exp-amount').value = ''; document.getElementById('exp-split').value = '1';
-                this.currentExpenseDateId = appData.currentDateId || TRIP_DATES[0].id; this.renderDateSlider(); openModal('modal-expense');
+                document.getElementById('exp-currency').value = 'JPY'; document.getElementById('exp-method').value = '現金';
+                this.currentExpenseDateId = appData.currentDateId || appData.dates[0].id; this.renderDateSlider(); openModal('modal-expense');
             },
-            addExpense: function() {
-                const item = document.getElementById('exp-item').value.trim(); const amount = parseFloat(document.getElementById('exp-amount').value);
+            editExpense: function(id) {
+                const exp = appData.expenses.find(e => e.id === id); if (!exp) return;
+                this.editingExpId = id; 
+                const titleEl = document.getElementById('expense-modal-title'); if (titleEl) titleEl.innerHTML = '<i class="fas fa-edit text-rose mr-2"></i>編輯花費';
+                document.getElementById('exp-item').value = exp.item;
+                document.getElementById('exp-amount').value = (exp.currency === 'JPY' ? exp.totalJpy : exp.totalTwd) || exp.amount;
+                document.getElementById('exp-currency').value = exp.currency || 'JPY'; document.getElementById('exp-method').value = exp.method || '現金'; document.getElementById('exp-split').value = exp.split || 1;
+                const dateObj = appData.dates.find(d => d.label === exp.date);
+                this.currentExpenseDateId = dateObj ? dateObj.id : (appData.currentDateId || appData.dates[0].id);
+                this.renderDateSlider(); openModal('modal-expense');
+            },
+            saveExpense: function() {
+                const itemEl = document.getElementById('exp-item'); const amountEl = document.getElementById('exp-amount');
+                if (!itemEl || !amountEl) return;
+                const item = itemEl.value.trim(); const amount = parseFloat(amountEl.value);
                 if(!item || isNaN(amount)) return alert('請填寫品項與正確金額！');
-                const currency = document.getElementById('exp-currency').value; const method = document.getElementById('exp-method').value;
-                const split = parseInt(document.getElementById('exp-split').value) || 1;
+                const currency = document.getElementById('exp-currency').value; const method = document.getElementById('exp-method').value; const split = parseInt(document.getElementById('exp-split').value) || 1;
                 const totalTwd = currency === 'JPY' ? Math.round(amount * EX_RATE) : amount; const totalJpy = currency === 'JPY' ? amount : Math.round(amount / EX_RATE);
                 const myCostTwd = Math.round(totalTwd / split); const myCostJpy = Math.round(totalJpy / split);
-                const dateObj = TRIP_DATES.find(d => d.id === this.currentExpenseDateId); const dateLabel = dateObj ? dateObj.label : '未定';
-                appData.expenses.unshift({ id: Date.now().toString(), date: dateLabel, item, amount, currency, method, split, myCostTwd, myCostJpy, totalJpy, totalTwd });
+                const dateObj = appData.dates.find(d => d.id === this.currentExpenseDateId); const dateLabel = dateObj ? dateObj.label : '未定';
+                if (this.editingExpId) {
+                    const idx = appData.expenses.findIndex(e => e.id === this.editingExpId);
+                    if (idx !== -1) { appData.expenses[idx] = { ...appData.expenses[idx], date: dateLabel, item, amount, currency, method, split, myCostTwd, myCostJpy, totalJpy, totalTwd }; }
+                    this.editingExpId = null;
+                } else {
+                    appData.expenses.unshift({ id: Date.now().toString(), date: dateLabel, item, amount, currency, method, split, myCostTwd, myCostJpy, totalJpy, totalTwd });
+                }
                 saveData(); closeModal('modal-expense'); this.renderExpenses();
             },
             deleteExpenseItem: function(id) { if(!confirm('確定要刪除這筆紀錄嗎？')) return; appData.expenses = appData.expenses.filter(e => e.id !== id); saveData(); this.renderExpenses(); },
@@ -828,7 +849,7 @@
                     grouped[e.date].items.push({ ...e, costTwd, costJpy, tJpy }); grouped[e.date].totalTwd += costTwd; grouped[e.date].totalJpy += costJpy;
                 });
                 document.getElementById('total-expense-twd').innerHTML = `NT$ ${grandTotalTwd.toLocaleString()} <span class="text-lg text-taupe font-normal" id="total-expense-jpy">(¥ ${grandTotalJpy.toLocaleString()})</span>`;
-                const sortedDateKeys = Object.keys(grouped).sort((a, b) => TRIP_DATES.findIndex(d => d.label === a) - TRIP_DATES.findIndex(d => d.label === b));
+                const sortedDateKeys = Object.keys(grouped).sort((a, b) => appData.dates.findIndex(d => d.label === a) - appData.dates.findIndex(d => d.label === b));
                 sortedDateKeys.forEach(dateStr => {
                     const group = grouped[dateStr]; const groupEl = document.createElement('div'); groupEl.className = 'bg-cream p-5 rounded-3xl shadow-soft';
                     let innerHTML = `
@@ -839,13 +860,21 @@
                     group.items.forEach(e => {
                         innerHTML += `
                             <div class="flex justify-between items-center bg-white p-3 rounded-2xl border border-[#E5E0DA]">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-10 h-10 bg-[#F0EBE6] rounded-full flex items-center justify-center text-taupe"><i class="fas ${methodIcons[e.method] || 'fa-receipt'}"></i></div>
-                                    <div><div class="font-bold text-coffee text-sm">${e.item}</div>${e.split > 1 ? `<div class="text-[10px] text-taupe font-num font-bold mt-0.5">總消費 ¥ ${e.tJpy.toLocaleString()}</div>` : ''}<div class="text-[10px] text-taupe mt-0.5">${e.method} ${e.split > 1 ? `• <span class="text-rose font-bold">${e.split}人分帳</span>` : ''}</div></div>
+                                <div class="flex items-center gap-2">
+                                    <div class="w-10 h-10 bg-[#F0EBE6] rounded-full flex items-center justify-center text-taupe flex-shrink-0"><i class="fas ${methodIcons[e.method] || 'fa-receipt'}"></i></div>
+                                    <div class="min-w-0">
+                                        <div class="font-bold text-coffee text-sm truncate">${e.item}</div>
+                                        ${e.split > 1 ? `<div class="text-[10px] text-taupe font-num font-bold mt-0.5">總消費 ¥ ${e.tJpy.toLocaleString()}</div>` : ''}
+                                        <div class="text-[10px] text-taupe mt-0.5">${e.method} ${e.split > 1 ? `• <span class="text-rose font-bold">${e.split}人分帳</span>` : ''}</div>
+                                    </div>
                                 </div>
-                                <div class="text-right flex items-center gap-2">
-                                    <div><div class="font-bold font-num text-coffee">NT$ ${e.costTwd.toLocaleString()}</div><div class="text-[10px] font-num text-rose">¥ ${e.costJpy.toLocaleString()}</div></div>
-                                    <button onclick="WalletModule.deleteExpenseItem('${e.id}')" class="text-taupe/40 p-2 active:scale-90 transition"><i class="fas fa-times"></i></button>
+                                <div class="text-right flex items-center gap-1">
+                                    <div class="text-right mr-1">
+                                        <div class="font-bold font-num text-coffee">NT$ ${e.costTwd.toLocaleString()}</div>
+                                        <div class="text-[10px] font-num text-rose">¥ ${e.costJpy.toLocaleString()}</div>
+                                    </div>
+                                    <button onclick="WalletModule.editExpense('${e.id}')" class="text-taupe/60 hover:text-coffee p-2 active:scale-90 transition"><i class="fas fa-edit"></i></button>
+                                    <button onclick="WalletModule.deleteExpenseItem('${e.id}')" class="text-taupe/40 hover:text-rose p-2 active:scale-90 transition"><i class="fas fa-times"></i></button>
                                 </div>
                             </div>`;
                     });
@@ -854,9 +883,7 @@
             }
         };
 
-        // ------------------------------------------
-        // ✅ LISTS 清單模組
-        // ------------------------------------------
+        // --- ✅ ListModule ---
         const ListModule = {
             currentTodoCat: 'carry', tempShopImg: '',
             init: function() { appData.todos.forEach(t => { if(!t.category) t.category = 'carry'; }); this.renderTodos(); this.renderShoppingList(); this.updateMemo(true); },
@@ -916,7 +943,7 @@
         };
 
         // ------------------------------------------
-        // 共用導航切換
+        // 共用切換與控制
         // ------------------------------------------
         function switchTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(el => { el.classList.add('hidden'); el.classList.remove('flex', 'block'); });
@@ -935,25 +962,19 @@
         function closeModal(id) { const el = document.getElementById(id); if(el) el.classList.add('hidden'); }
 
         // ------------------------------------------
-        // 啟動程序
+        // 核心啟動區 (Master Boot)
         // ------------------------------------------
         window.addEventListener('load', function() {
             try {
+                HomeModule.init();
                 TripModule.init(); 
                 WalletModule.init(); 
                 ListModule.init();
                 
-                switchHomeMode(appData.homeMode || 'entry');
-                
-                const hn = document.getElementById('hotel-name'); if(hn) hn.value = appData.hotelName || '';
-                if(appData.hotelImg) showImagePreview('hotelImg', appData.hotelImg);
-                
-                updateTaxMemo(true);
-
                 switchTab('home');
 
             } catch (err) { 
-                console.error("初始化發生嚴重錯誤:", err); 
+                console.error("系統啟動發生嚴重錯誤:", err); 
             }
         });
     </script>
