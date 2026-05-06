@@ -15,9 +15,6 @@
     
     <!-- Tailwind CSS (CDN) -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- SortableJS (拖曳排序) -->
-    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
 
     <!-- Tailwind Config -->
     <script>
@@ -68,16 +65,6 @@
             padding: 0.75rem 1rem; color: #555150; transition: all 0.2s;
         }
         .ins-input:focus { outline: none; border-color: #B8A394; box-shadow: 0 0 0 3px rgba(184, 163, 148, 0.2); }
-
-        /* ====== 手機端拖曳專用防護 ====== */
-        .drag-handle { 
-            touch-action: none; /* 徹底阻斷在把手上滑動造成的手勢衝突 */
-        }
-        .sortable-fallback {
-            opacity: 0.9 !important;
-            box-shadow: 0 15px 30px rgba(85, 81, 80, 0.15) !important;
-            z-index: 9999 !important;
-        }
     </style>
 </head>
 <body class="font-sans antialiased pb-24 selection:bg-rose selection:text-white">
@@ -85,7 +72,7 @@
     <!-- App 容器 -->
     <div id="app" class="max-w-md mx-auto min-h-screen relative overflow-x-hidden">
 
-        <!-- ==================== 1. 首頁 (HOME) ==================== -->
+        <!-- ==================== 1. 首頁 (HOME 封包區) ==================== -->
         <section id="tab-home" class="p-5 space-y-6 tab-content block">
             <div class="flex justify-between items-center pt-4">
                 <div>
@@ -137,7 +124,7 @@
             </div>
         </section>
 
-        <!-- ==================== 2. 行程 (TRIP) ==================== -->
+        <!-- ==================== 2. 行程 (TRIP 封包區) ==================== -->
         <section id="tab-itinerary" class="p-5 space-y-4 tab-content hidden flex-col h-full">
             <h2 class="text-2xl font-bold font-num text-coffee pt-4 mb-2">Itinerary</h2>
             <div class="flex overflow-x-auto gap-3 pb-2 hide-scrollbar snap-x" id="date-slider"></div>
@@ -145,10 +132,12 @@
                 <span class="text-sm font-bold text-taupe" id="current-date-display"></span>
                 <button onclick="TripModule.openModal()" class="bg-coffee text-white px-4 py-1.5 rounded-full text-sm font-bold shadow-md active:scale-95 transition"><i class="fas fa-plus mr-1"></i>新增</button>
             </div>
-            <div id="itinerary-list" class="space-y-4 pb-10 min-h-[50vh]"></div>
+            
+            <p class="text-[10px] text-taupe text-right"><i class="fas fa-info-circle mr-1"></i>長按卡片即可開啟排序</p>
+            <div id="itinerary-list" class="space-y-4 pb-10 min-h-[50vh] relative"></div>
         </section>
 
-        <!-- ==================== 3. 記帳與匯率 (WALLET) ==================== -->
+        <!-- ==================== 3. 記帳與匯率 (WALLET 封包區) ==================== -->
         <section id="tab-wallet" class="p-5 space-y-6 tab-content hidden relative min-h-[85vh]">
             <h2 class="text-2xl font-bold font-num text-coffee pt-4">Wallet</h2>
             
@@ -187,10 +176,11 @@
             </div>
         </section>
 
-        <!-- ==================== 4. 清單 (LISTS) ==================== -->
+        <!-- ==================== 4. 清單 (LISTS 封包區) ==================== -->
         <section id="tab-lists" class="p-5 space-y-6 tab-content hidden pb-20">
             <h2 class="text-2xl font-bold font-num text-coffee pt-4">Lists</h2>
             
+            <!-- 區塊1: 行前準備 -->
             <div class="bg-cream p-5 rounded-3xl shadow-soft">
                 <h3 class="font-bold text-coffee mb-4"><i class="fas fa-check-square text-rose mr-2"></i>行前準備</h3>
                 <div class="flex gap-2 mb-4 bg-[#F0EBE6] p-1 rounded-2xl">
@@ -205,6 +195,7 @@
                 <div id="todo-list" class="space-y-2"></div>
             </div>
 
+            <!-- 區塊2: 購物清單 -->
             <div class="bg-cream p-5 rounded-3xl shadow-soft">
                 <h3 class="font-bold text-coffee mb-4"><i class="fas fa-shopping-bag text-rose mr-2"></i>購物清單</h3>
                 <div class="space-y-3 mb-5">
@@ -224,6 +215,7 @@
                 <div id="shopping-list" class="space-y-3"></div>
             </div>
 
+            <!-- 區塊3: 個人備忘錄 -->
             <div class="bg-cream p-5 rounded-3xl shadow-soft">
                 <h3 class="font-bold text-coffee mb-4"><i class="fas fa-book-open text-rose mr-2"></i>個人備忘錄</h3>
                 <p class="text-xs text-taupe mb-2">輸入網址會自動變成按鈕喔！</p>
@@ -249,8 +241,7 @@
         </nav>
 
         <!-- ==================== 共用 Modals ==================== -->
-        
-        <!-- 🇯🇵 求生日文 Modal -->
+        <!-- 🇯🇵 求生日文 Modal (帶有點擊放大功能) -->
         <div id="modal-jp" class="fixed inset-0 bg-coffee/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
             <div class="bg-cream w-full max-w-sm rounded-3xl p-6 shadow-2xl modal-enter relative">
                 <button onclick="closeModal('modal-jp')" class="absolute top-4 right-4 text-taupe text-xl p-2 active:scale-90 transition"><i class="fas fa-times"></i></button>
@@ -442,7 +433,7 @@
         // ------------------------------------------
         const APP_KEY = 'insTravelApp';
         const EX_RATE = 0.21;
-        const APP_VERSION = '3.0'; // 穩定鎖定版
+        const APP_VERSION = '3.0'; 
 
         const TRIP_DATES = Object.freeze([
             { id: '12-22', label: 'Tue 22' }, { id: '12-23', label: 'Wed 23' }, { id: '12-24', label: 'Thu 24' },
@@ -502,8 +493,7 @@
             homeMode: 'entry', 
             vjwMember: 'personal', vjwImg_personal: '', vjwImg_child: '',
             parkingImg: '', hotelName: '', hotelImg: '',
-            currentDateId: TRIP_DATES[0].id, 
-            dates: TRIP_DATES, 
+            currentDateId: TRIP_DATES[0].id, dates: TRIP_DATES, 
             itinerary: defaultItinerary, 
             expenses: [], memo: '', shopping:[], taxMemo: '', 
             todos:[ 
@@ -533,7 +523,7 @@
                 }
             }
         } catch (e) {
-            console.error("Storage Error, resetting securely.");
+            console.error("Storage Error");
         }
 
         function saveData(key, value) {
@@ -677,9 +667,10 @@
             }
         };
 
-        // --- 🧳 TripModule ---
+        // --- 🧳 TripModule (手機長按排序升級版) ---
         const TripModule = {
             currentTransMethod: '', editingItiId: null,
+            reorderingId: null, longPressTimer: null,
             init: function() {
                 appData.dates = appData.dates || TRIP_DATES;
                 if(!appData.dates.find(d => d.id === appData.currentDateId)) appData.currentDateId = appData.dates[0].id;
@@ -741,58 +732,115 @@
                 appData.itinerary[appData.currentDateId] = appData.itinerary[appData.currentDateId].filter(i => i.id !== id);
                 saveData(); this.renderItinerary();
             },
+            
+            // 手機長按邏輯
+            handleTouchStart: function(e, id) {
+                if(e.target.closest('button') || e.target.closest('a')) return;
+                this.longPressTimer = setTimeout(() => {
+                    this.reorderingId = id;
+                    if (navigator.vibrate) navigator.vibrate(50);
+                    this.renderItinerary();
+                }, 500);
+            },
+            handleTouchCancel: function() {
+                if(this.longPressTimer) clearTimeout(this.longPressTimer);
+            },
+            moveUp: function(id, e) {
+                if(e) e.stopPropagation();
+                const items = appData.itinerary[appData.currentDateId];
+                const idx = items.findIndex(i => i.id === id);
+                if(idx > 0) {
+                    const temp = items[idx]; items[idx] = items[idx - 1]; items[idx - 1] = temp;
+                    saveData(); this.renderItinerary();
+                }
+            },
+            moveDown: function(id, e) {
+                if(e) e.stopPropagation();
+                const items = appData.itinerary[appData.currentDateId];
+                const idx = items.findIndex(i => i.id === id);
+                if(idx < items.length - 1) {
+                    const temp = items[idx]; items[idx] = items[idx + 1]; items[idx + 1] = temp;
+                    saveData(); this.renderItinerary();
+                }
+            },
+
             renderItinerary: function() {
                 const container = document.getElementById('itinerary-list'); container.innerHTML = '';
                 const items = appData.itinerary[appData.currentDateId] ||[];
                 if(items.length === 0) {
                     container.innerHTML = `<div class="text-center text-taupe mt-10 text-sm"><i class="fas fa-plane-departure text-3xl mb-2 opacity-50 block"></i>這天還沒有排行程喔！</div>`; return;
                 }
+
+                // 排序模式的半透明遮罩
+                if (this.reorderingId) {
+                    const overlay = document.createElement('div');
+                    overlay.className = 'fixed inset-0 z-30 bg-coffee/5 backdrop-blur-[1px]';
+                    overlay.onclick = () => { this.reorderingId = null; this.renderItinerary(); };
+                    overlay.addEventListener('touchstart', (e) => { e.preventDefault(); this.reorderingId = null; this.renderItinerary(); });
+                    container.appendChild(overlay);
+                }
+
                 const typeIcons = { '景點':'fa-map-marker-alt', '美食':'fa-utensils', '住宿':'fa-bed', '購物':'fa-shopping-bag', '航班':'fa-plane', '其他':'fa-star' };
                 const transIcons = { '飛機':'fa-plane', '電車':'fa-train', '汽車':'fa-car', '步行':'fa-walking' };
+                
                 items.forEach((item, index) => {
-                    const el = document.createElement('div'); el.className = 'bg-cream rounded-3xl p-4 shadow-sm relative group'; el.dataset.id = item.id;
+                    const el = document.createElement('div'); 
+                    const isReordering = this.reorderingId === item.id;
+                    
+                    el.className = `bg-cream rounded-3xl p-4 shadow-sm relative group transition-all duration-300 select-none ${isReordering ? 'z-40 ring-4 ring-rose/40 scale-[1.02] shadow-xl' : 'z-10'}`; 
+                    el.dataset.id = item.id;
+                    el.style.webkitUserSelect = 'none'; el.style.userSelect = 'none'; el.style.webkitTouchCallout = 'none';
+                    
+                    // 綁定長按事件
+                    el.addEventListener('touchstart', (e) => this.handleTouchStart(e, item.id));
+                    el.addEventListener('touchmove', () => this.handleTouchCancel());
+                    el.addEventListener('touchend', () => this.handleTouchCancel());
+                    el.addEventListener('mousedown', (e) => this.handleTouchStart(e, item.id));
+                    el.addEventListener('mousemove', () => this.handleTouchCancel());
+                    el.addEventListener('mouseup', () => this.handleTouchCancel());
+                    el.addEventListener('mouseleave', () => this.handleTouchCancel());
+                    el.addEventListener('contextmenu', e => { if(this.longPressTimer || this.reorderingId) e.preventDefault(); });
+
+                    let actionHtml = '';
+                    if (isReordering) {
+                        actionHtml = `
+                            <div class="flex gap-4 text-rose bg-rose/10 px-4 py-1.5 rounded-full items-center shadow-inner-soft pointer-events-auto">
+                                <button onclick="TripModule.moveUp('${item.id}', event)" class="${index === 0 ? 'opacity-30' : 'active:scale-90'} text-xl transition"><i class="fas fa-arrow-up"></i></button>
+                                <div class="w-px h-4 bg-rose/30"></div>
+                                <button onclick="TripModule.moveDown('${item.id}', event)" class="${index === items.length - 1 ? 'opacity-30' : 'active:scale-90'} text-xl transition"><i class="fas fa-arrow-down"></i></button>
+                            </div>
+                        `;
+                    } else {
+                        actionHtml = `
+                            <div class="flex gap-3 text-taupe pointer-events-auto">
+                                <button onclick="TripModule.openModal('${item.id}')" class="p-1 active:scale-90 transition"><i class="fas fa-edit"></i></button>
+                                <button onclick="TripModule.deleteItem('${item.id}')" class="p-1 active:scale-90 transition"><i class="fas fa-trash-alt"></i></button>
+                            </div>
+                        `;
+                    }
+
                     let html = `
                         <div class="flex justify-between items-start mb-2">
                             <span class="text-rose font-bold text-xs bg-rose/10 px-2 py-1 rounded-full"><i class="fas ${typeIcons[item.type] || 'fa-map-pin'} mr-1"></i>${item.type}</span>
-                            <div class="flex gap-3 text-taupe">
-                                <button onclick="TripModule.openModal('${item.id}')"><i class="fas fa-edit"></i></button>
-                                <button onclick="TripModule.deleteItem('${item.id}')"><i class="fas fa-trash-alt"></i></button>
-                                <i class="fas fa-bars drag-handle cursor-grab active:cursor-grabbing"></i>
-                            </div>
+                            ${actionHtml}
                         </div>
-                        <h4 class="font-bold text-coffee text-lg leading-tight mb-1">${item.name}</h4>`;
+                        <h4 class="font-bold text-coffee text-lg leading-tight mb-1 pointer-events-none">${item.name}</h4>`;
+                        
                     if(item.time || item.ticket) {
-                        html += `<div class="text-xs text-taupe mb-2 flex gap-3">`;
+                        html += `<div class="text-xs text-taupe mb-2 flex gap-3 pointer-events-none">`;
                         if(item.time) html += `<span><i class="far fa-clock mr-1"></i>${item.time}</span>`;
                         if(item.ticket) html += `<span><i class="fas fa-ticket-alt mr-1"></i>${item.ticket}</span>`;
                         html += `</div>`;
                     }
-                    if(item.note) html += `<div class="bg-white/50 text-coffee/80 text-sm p-2 rounded-xl mb-3">${item.note}</div>`;
-                    if(item.mapUrl) html += `<a href="${item.mapUrl}" target="_blank" class="inline-block w-full bg-[#F0EBE6] text-center text-coffee font-bold text-sm py-2 rounded-2xl active:bg-taupe transition"><i class="fas fa-location-arrow text-rose mr-1"></i>Google Map 導航</a>`;
+                    if(item.note) html += `<div class="bg-white/50 text-coffee/80 text-sm p-2 rounded-xl mb-3 pointer-events-none">${item.note}</div>`;
+                    if(item.mapUrl) html += `<a href="${item.mapUrl}" target="_blank" class="pointer-events-auto inline-block w-full bg-[#F0EBE6] text-center text-coffee font-bold text-sm py-2 rounded-2xl active:bg-taupe transition relative z-20"><i class="fas fa-location-arrow text-rose mr-1"></i>Google Map 導航</a>`;
                     if(index < items.length - 1 && (item.transMethod || item.transTime)) {
                         const tIcon = transIcons[item.transMethod] || 'fa-arrow-right'; const tLabel = item.transMethod ? item.transMethod : '';
-                        html += `<div class="absolute -bottom-6 left-6 flex items-center gap-2 text-xs font-bold text-taupe z-10"><div class="w-1 h-6 bg-dashed border-l-2 border-dashed border-taupe/50"></div><span class="bg-[#DBC3B7] px-2 py-1 rounded-full text-white shadow-sm flex items-center"><i class="fas ${tIcon} ${tLabel ? 'mr-1' : ''}"></i>${tLabel} ${item.transTime || ''}</span></div>`;
+                        html += `<div class="absolute -bottom-6 left-6 flex items-center gap-2 text-xs font-bold text-taupe z-10 pointer-events-none"><div class="w-1 h-6 bg-dashed border-l-2 border-dashed border-taupe/50"></div><span class="bg-[#DBC3B7] px-2 py-1 rounded-full text-white shadow-sm flex items-center"><i class="fas ${tIcon} ${tLabel ? 'mr-1' : ''}"></i>${tLabel} ${item.transTime || ''}</span></div>`;
                         el.classList.add('mb-8');
                     }
                     el.innerHTML = html; container.appendChild(el);
                 });
-                
-                // 📱 手機端拖曳解決方案 (延遲觸發 + 關閉原生拖曳)
-                if (typeof Sortable !== 'undefined') {
-                    new Sortable(container, {
-                        handle: '.drag-handle', 
-                        animation: 150, 
-                        ghostClass: 'opacity-50',
-                        delay: 150,               // 關鍵：長按 150ms 才能拖，防止滑動衝突
-                        delayOnTouchOnly: true,   // 關鍵：只在手機端啟用延遲
-                        forceFallback: true,      // 關鍵：強制用自訂效果，避開 Safari 原生 Bug
-                        fallbackClass: 'sortable-fallback',
-                        onEnd: (evt) => {
-                            const newArr = []; container.querySelectorAll('[data-id]').forEach(el => { newArr.push(items.find(i => i.id === el.dataset.id)); });
-                            appData.itinerary[appData.currentDateId] = newArr; saveData(); TripModule.renderItinerary();
-                        }
-                    });
-                }
             }
         };
 
@@ -979,7 +1027,7 @@
         function closeModal(id) { const el = document.getElementById(id); if(el) el.classList.add('hidden'); }
 
         // ------------------------------------------
-        // 啟動程序
+        // 核心啟動區
         // ------------------------------------------
         window.addEventListener('load', function() {
             try {
@@ -990,7 +1038,7 @@
                 
                 switchTab('home');
             } catch (err) { 
-                console.error("系統啟動發生錯誤:", err); 
+                console.error("系統啟動發生嚴重錯誤:", err); 
             }
         });
     </script>
