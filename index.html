@@ -127,21 +127,18 @@
             </div>
         </section>
 
-        <!-- ==================== 2. 行程 (TRIP) ==================== -->
+        <!-- ==================== 2. 行程 (TRIP 封包區) ==================== -->
         <section id="tab-itinerary" class="p-5 space-y-4 tab-content hidden flex-col h-full">
             <h2 class="text-2xl font-bold font-num text-coffee pt-4 mb-2">Itinerary</h2>
-            
             <div class="flex overflow-x-auto gap-3 pb-2 hide-scrollbar snap-x" id="date-slider"></div>
-
             <div class="flex justify-between items-center mt-2">
                 <span class="text-sm font-bold text-taupe" id="current-date-display"></span>
                 <button onclick="TripModule.openModal()" class="bg-coffee text-white px-4 py-1.5 rounded-full text-sm font-bold shadow-md active:scale-95 transition"><i class="fas fa-plus mr-1"></i>新增</button>
             </div>
-
             <div id="itinerary-list" class="space-y-4 pb-10 min-h-[50vh]"></div>
         </section>
 
-        <!-- ==================== 3. 記帳與匯率 (WALLET) ==================== -->
+        <!-- ==================== 3. 記帳與匯率 (WALLET 封包區) ==================== -->
         <section id="tab-wallet" class="p-5 space-y-6 tab-content hidden relative min-h-[85vh]">
             <h2 class="text-2xl font-bold font-num text-coffee pt-4">Wallet</h2>
             
@@ -180,7 +177,7 @@
             </div>
         </section>
 
-        <!-- ==================== 4. 清單 (LISTS) ==================== -->
+        <!-- ==================== 4. 清單 (LISTS 封包區) ==================== -->
         <section id="tab-lists" class="p-5 space-y-6 tab-content hidden pb-20">
             <h2 class="text-2xl font-bold font-num text-coffee pt-4">Lists</h2>
             
@@ -242,7 +239,8 @@
         </nav>
 
         <!-- ==================== 共用 Modals ==================== -->
-        <!-- 求生日文 Modal (已更新) -->
+        
+        <!-- 求生日文 Modal (已更新所有實用句子) -->
         <div id="modal-jp" class="fixed inset-0 bg-coffee/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
             <div class="bg-cream w-full max-w-sm rounded-3xl p-6 shadow-2xl modal-enter relative">
                 <button onclick="closeModal('modal-jp')" class="absolute top-4 right-4 text-taupe text-xl"><i class="fas fa-times"></i></button>
@@ -250,11 +248,11 @@
                 <div class="space-y-4 max-h-[60vh] overflow-y-auto hide-scrollbar pr-2">
                     <div class="border-b border-taupe/20 pb-2"><p class="font-bold text-rose text-sm">請問這個多少錢？</p><p class="text-coffee font-medium">Kore wa ikura desu ka?</p><p class="text-xs text-taupe">これはいくらですか？</p></div>
                     <div class="border-b border-taupe/20 pb-2"><p class="font-bold text-rose text-sm">請問廁所在哪裡？</p><p class="text-coffee font-medium">Toire wa doko desu ka?</p><p class="text-xs text-taupe">トイレはどこですか？</p></div>
-                    <div class="border-b border-taupe/20 pb-2"><p class="font-bold text-rose text-sm">請問可以使用信用卡嗎？</p><p class="text-coffee font-medium">Kurejitto kādo wa tsukaemasu ka?</p><p class="text-xs text-taupe">クレジットカードは使えますか？</p></div>
-                    <div class="border-b border-taupe/20 pb-2"><p class="font-bold text-rose text-sm">不好意思！(呼叫店員)我要點餐。</p><p class="text-coffee font-medium">Sumimasen! Chūmon o onegai shimasu.</p><p class="text-xs text-taupe">すみません！注文をお願いします。</p></div>
-                    <div class="border-b border-taupe/20 pb-2"><p class="font-bold text-rose text-sm">請給我水。</p><p class="text-coffee font-medium">O-mizu o kudasai.</p><p class="text-xs text-taupe">お水をください。</p></div>
-                    <div class="border-b border-taupe/20 pb-2"><p class="font-bold text-rose text-sm">我要結帳。</p><p class="text-coffee font-medium">O-kaikei o onegai shimasu.</p><p class="text-xs text-taupe">お会計をお願いします。</p></div>
-                    <div class="pb-2"><p class="font-bold text-rose text-sm">請問可以分開結帳嗎？</p><p class="text-coffee font-medium">Betsu-betsu de onegai shimasu.</p><p class="text-xs text-taupe">別々でお願いします。</p></div>
+                    <div class="border-b border-taupe/20 pb-2"><p class="font-bold text-rose text-sm">不好意思，請問最近的醫院在哪裡？</p><p class="text-coffee font-medium">sumimasen, ichiban chikai byōin wa dokodesuka.</p><p class="text-xs text-taupe">すみません、一番近い病院はどこですか。</p></div>
+                    <div class="border-b border-taupe/20 pb-2"><p class="font-bold text-rose text-sm">哪裡有說中文的醫院？</p><p class="text-coffee font-medium">Chūgokugo ga tsūjiru byōin wa doko desu ka?</p><p class="text-xs text-taupe">中国語が通じる病院はどこですか？</p></div>
+                    <div class="border-b border-taupe/20 pb-2"><p class="font-bold text-rose text-sm">我發燒了</p><p class="text-coffee font-medium">Netsu ga arimasu</p><p class="text-xs text-taupe">熱があります</p></div>
+                    <div class="border-b border-taupe/20 pb-2"><p class="font-bold text-rose text-sm">請叫救護車</p><p class="text-coffee font-medium">Kyuukyuusha wo yonde kudasai</p><p class="text-xs text-taupe">救急車を呼んでください</p></div>
+                    <div class="pb-2"><p class="font-bold text-rose text-sm">請幫我聯絡警察</p><p class="text-coffee font-medium">Keisatsu wo yonde kudasai</p><p class="text-xs text-taupe">警察を呼んでください</p></div>
                 </div>
             </div>
         </div>
@@ -860,31 +858,28 @@
         function closeModal(id) { const el = document.getElementById(id); if(el) el.classList.add('hidden'); }
 
         // ------------------------------------------
-        // 安全啟動程序 (自帶防白畫面修復)
+        // 安全啟動程序 (使用 Load 確保完全不卡死)
         // ------------------------------------------
-        function initApp() {
+        window.addEventListener('load', function() {
             try {
                 TripModule.init(); 
                 WalletModule.init(); 
                 ListModule.init();
                 
+                // 強制初始化首頁並載入狀態
                 switchHomeMode(appData.homeMode || 'entry');
                 
                 const hn = document.getElementById('hotel-name'); if(hn) hn.value = appData.hotelName || '';
                 if(appData.hotelImg) showImagePreview('hotelImg', appData.hotelImg);
                 
-                updateTaxMemo(true); // 啟動時載入退稅筆記
+                updateTaxMemo(true);
 
                 switchTab('home');
+
             } catch (err) { 
-                console.error("初始化發生嚴重錯誤:", err); 
-                alert("讀取舊資料時發生衝突，為確保網頁正常運作，將重置您的暫存資料。");
-                localStorage.removeItem(APP_KEY);
-                location.reload();
+                console.error("啟動發生嚴重錯誤:", err); 
             }
-        }
-        
-        initApp();
+        });
     </script>
 </body>
 </html>
