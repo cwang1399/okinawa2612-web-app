@@ -75,7 +75,7 @@
     <!-- App 容器 -->
     <div id="app" class="max-w-md mx-auto min-h-screen relative overflow-x-hidden">
 
-        <!-- ==================== 1. 首頁 (HOME 封包區) ==================== -->
+        <!-- ==================== 1. 首頁 (HOME) ==================== -->
         <section id="tab-home" class="p-5 space-y-6 tab-content block">
             <div class="flex justify-between items-center pt-4">
                 <div>
@@ -94,7 +94,6 @@
                 <button onclick="HomeModule.switchHomeMode('drive')" id="btn-mode-drive" class="flex-1 py-2 text-center text-coffee z-10 font-bold transition-colors">自駕模式</button>
             </div>
 
-            <!-- 動態內容區 -->
             <div id="home-dynamic-content" class="space-y-6"></div>
 
             <div class="bg-cream rounded-3xl p-5 shadow-soft">
@@ -108,6 +107,7 @@
                         <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-rose shadow-sm"><i class="fas fa-phone"></i></div>
                         <span class="text-xs font-bold">緊急聯絡</span>
                     </button>
+                    <!-- 退稅工具按鈕 -->
                     <button onclick="openModal('modal-tax')" class="flex flex-col items-center gap-2 p-3 bg-[#F0EBE6] rounded-2xl active:scale-95 transition-transform">
                         <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-rose shadow-sm"><i class="fas fa-coins"></i></div>
                         <span class="text-xs font-bold">退稅</span>
@@ -119,14 +119,15 @@
                 <h3 class="font-bold text-coffee mb-4"><i class="fas fa-hotel text-rose mr-2"></i>住宿資訊</h3>
                 <input type="text" id="hotel-name" placeholder="輸入飯店名稱..." class="ins-input mb-3" onchange="saveData('hotelName', this.value)">
                 
-                <!-- 住宿截圖 (已新增預覽與刪除層) -->
+                <!-- 住宿截圖 -->
                 <div class="relative w-full h-32 bg-[#F0EBE6] rounded-2xl border-2 border-dashed border-taupe flex flex-col items-center justify-center overflow-hidden">
                     <input type="file" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" onchange="HomeModule.handleImageUpload(event, 'hotelImg')">
                     <i class="fas fa-cloud-upload-alt text-2xl text-taupe mb-1"></i>
                     <span class="text-xs text-taupe font-bold">上傳訂房憑證截圖</span>
                     
                     <div id="hotelImg-container" class="absolute inset-0 hidden z-20">
-                        <div id="hotelImg-preview" class="absolute inset-0 bg-cover bg-center"></div>
+                        <!-- 加入防選取與防拷貝彈出選單的 style -->
+                        <div id="hotelImg-preview" class="absolute inset-0 bg-cover bg-center select-none" style="-webkit-touch-callout: none; -webkit-user-select: none; user-select: none;"></div>
                         <button id="hotelImg-delete" onclick="HomeModule.deleteImage('hotelImg')" class="absolute top-2 right-2 bg-white/90 text-rose rounded-full w-8 h-8 flex items-center justify-center shadow-md hidden z-30 transition-transform active:scale-90"><i class="fas fa-times text-lg"></i></button>
                     </div>
                 </div>
@@ -134,7 +135,7 @@
             </div>
         </section>
 
-        <!-- ==================== 2. 行程 (TRIP 封包區) ==================== -->
+        <!-- ==================== 2. 行程 (TRIP) ==================== -->
         <section id="tab-itinerary" class="p-5 space-y-4 tab-content hidden flex-col h-full">
             <h2 class="text-2xl font-bold font-num text-coffee pt-4 mb-2">Itinerary</h2>
             <div class="flex overflow-x-auto gap-3 pb-2 hide-scrollbar snap-x" id="date-slider"></div>
@@ -142,11 +143,12 @@
                 <span class="text-sm font-bold text-taupe" id="current-date-display"></span>
                 <button onclick="TripModule.openModal()" class="bg-coffee text-white px-4 py-1.5 rounded-full text-sm font-bold shadow-md active:scale-95 transition"><i class="fas fa-plus mr-1"></i>新增</button>
             </div>
+            
             <p class="text-[10px] text-taupe text-right"><i class="fas fa-info-circle mr-1"></i>長按卡片即可開啟排序</p>
             <div id="itinerary-list" class="space-y-4 pb-10 min-h-[50vh] relative"></div>
         </section>
 
-        <!-- ==================== 3. 記帳與匯率 (WALLET 封包區) ==================== -->
+        <!-- ==================== 3. 記帳與匯率 (WALLET) ==================== -->
         <section id="tab-wallet" class="p-5 space-y-6 tab-content hidden relative min-h-[85vh]">
             <h2 class="text-2xl font-bold font-num text-coffee pt-4">Wallet</h2>
             
@@ -185,7 +187,7 @@
             </div>
         </section>
 
-        <!-- ==================== 4. 清單 (LISTS 封包區) ==================== -->
+        <!-- ==================== 4. 清單 (LISTS) ==================== -->
         <section id="tab-lists" class="p-5 space-y-6 tab-content hidden pb-20">
             <h2 class="text-2xl font-bold font-num text-coffee pt-4">Lists</h2>
             
@@ -446,7 +448,7 @@
         // ------------------------------------------
         const APP_KEY = 'insTravelApp';
         const EX_RATE = 0.21;
-        const APP_VERSION = '3.3'; // 版本號更新，確保新的全域事件綁定生效
+        const APP_VERSION = '3.4'; 
 
         const TRIP_DATES =[
             { id: '12-22', label: 'Tue 22' }, { id: '12-23', label: 'Wed 23' }, { id: '12-24', label: 'Thu 24' },
@@ -560,7 +562,7 @@
                 if(appData.hotelImg) this.showImagePreview('hotelImg', appData.hotelImg);
                 this.updateTaxMemo(true);
 
-                // 全域監聽點擊，點到圖片外部就隱藏所有刪除按鈕
+                // 全域監聽點擊，隱藏刪除按鈕
                 document.addEventListener('click', (e) => {
                     if (!e.target.closest('#hotelImg-container') && !e.target.closest('#vjwImg-container') && !e.target.closest('#parkingImg-container')) {
                         document.querySelectorAll('[id$="-delete"]').forEach(btn => btn.classList.add('hidden'));
@@ -605,9 +607,8 @@
                                     <span class="text-sm text-taupe font-bold">點擊上傳 <span id="vjw-member-label" class="text-rose">個人</span> QR Code</span>
                                 </div>
                                 
-                                <!-- VJW 圖片預覽與刪除層 -->
                                 <div id="vjwImg-container" class="absolute inset-0 hidden z-20">
-                                    <div id="vjwImg-preview" class="absolute inset-0 bg-contain bg-no-repeat bg-center"></div>
+                                    <div id="vjwImg-preview" class="absolute inset-0 bg-contain bg-no-repeat bg-center select-none" style="-webkit-touch-callout: none; -webkit-user-select: none; user-select: none;"></div>
                                     <button id="vjwImg-delete" onclick="HomeModule.deleteVjwImage()" class="absolute top-2 right-2 bg-white/90 text-rose rounded-full w-8 h-8 flex items-center justify-center shadow-md hidden z-30 transition-transform active:scale-90"><i class="fas fa-times text-lg"></i></button>
                                 </div>
                             </div>
@@ -629,9 +630,8 @@
                                 <i class="fas fa-parking text-3xl text-taupe mb-2"></i>
                                 <span class="text-sm text-taupe font-bold">拍下車位號碼</span>
                                 
-                                <!-- 停車圖片預覽與刪除層 -->
                                 <div id="parkingImg-container" class="absolute inset-0 hidden z-20">
-                                    <div id="parkingImg-preview" class="absolute inset-0 bg-cover bg-center"></div>
+                                    <div id="parkingImg-preview" class="absolute inset-0 bg-cover bg-center select-none" style="-webkit-touch-callout: none; -webkit-user-select: none; user-select: none;"></div>
                                     <button id="parkingImg-delete" onclick="HomeModule.deleteImage('parkingImg')" class="absolute top-2 right-2 bg-white/90 text-rose rounded-full w-8 h-8 flex items-center justify-center shadow-md hidden z-30 transition-transform active:scale-90"><i class="fas fa-times text-lg"></i></button>
                                 </div>
                             </div>
@@ -753,16 +753,17 @@
                 this.switchVjwMember(member);
             },
 
-            // 綁定長按刪除與雙擊放大的核心邏輯
             bindImageEvents: function(key, dataUrl) {
                 const preview = document.getElementById(`${key}-preview`);
                 if (!preview) return;
                 
+                // 複製節點重置事件，避免重複綁定
                 const newPreview = preview.cloneNode(true);
                 preview.parentNode.replaceChild(newPreview, preview);
                 
                 let timer;
                 let lastTap = 0;
+                let isLongPress = false;
 
                 const showDelete = () => {
                     if (navigator.vibrate) navigator.vibrate(50);
@@ -779,30 +780,45 @@
                     return false;
                 };
                 
-                // 手機觸控事件
                 newPreview.addEventListener('touchstart', (e) => {
-                    timer = setTimeout(() => { showDelete(); }, 500);
+                    isLongPress = false;
+                    timer = setTimeout(() => { 
+                        isLongPress = true;
+                        showDelete(); 
+                    }, 500);
                 });
                 newPreview.addEventListener('touchmove', () => { clearTimeout(timer); });
                 newPreview.addEventListener('touchend', (e) => {
                     clearTimeout(timer);
+                    if (isLongPress) {
+                        if(e.cancelable) e.preventDefault();
+                        return;
+                    }
+                    
                     const currentTime = new Date().getTime();
                     const tapLength = currentTime - lastTap;
                     
                     if (tapLength < 300 && tapLength > 0) {
                         HomeModule.showFullScreenImage(dataUrl);
-                        e.preventDefault();
+                        if(e.cancelable) e.preventDefault();
                     } else {
-                        if(hideDelete()) { e.preventDefault(); }
+                        if(hideDelete()) { if(e.cancelable) e.preventDefault(); }
                     }
                     lastTap = currentTime;
                 });
                 
-                // 電腦滑鼠事件
                 newPreview.addEventListener('mousedown', (e) => {
-                    timer = setTimeout(() => { showDelete(); }, 500);
+                    if(e.button !== 0) return; 
+                    isLongPress = false;
+                    timer = setTimeout(() => { 
+                        isLongPress = true;
+                        showDelete(); 
+                    }, 500);
                 });
-                newPreview.addEventListener('mouseup', () => clearTimeout(timer));
+                newPreview.addEventListener('mouseup', (e) => { 
+                    clearTimeout(timer); 
+                    if (isLongPress && e.cancelable) e.preventDefault();
+                });
                 newPreview.addEventListener('mousemove', () => clearTimeout(timer));
                 newPreview.addEventListener('mouseleave', () => { clearTimeout(timer); hideDelete(); });
                 newPreview.addEventListener('dblclick', () => { HomeModule.showFullScreenImage(dataUrl); });
@@ -843,7 +859,7 @@
         const TripModule = {
             currentTransMethod: '', editingItiId: null,
             init: function() {
-                appData.dates = TRIP_DATES;
+                appData.dates = appData.dates || TRIP_DATES;
                 if(!appData.dates.find(d => d.id === appData.currentDateId)) appData.currentDateId = appData.dates[0].id;
                 this.renderDateSlider(); this.renderItinerary();
             },
@@ -916,16 +932,13 @@
                 const transIcons = { '飛機':'fa-plane', '電車':'fa-train', '汽車':'fa-car', '步行':'fa-walking' };
                 items.forEach((item, index) => {
                     const el = document.createElement('div'); el.className = 'bg-cream rounded-3xl p-4 shadow-sm relative group'; el.dataset.id = item.id;
-                    
-                    let mapBtn = item.mapUrl ? `<a href="${item.mapUrl}" target="_blank" class="p-1 text-rose active:scale-90 transition"><i class="fas fa-location-arrow"></i></a>` : '';
                     let html = `
                         <div class="flex justify-between items-start mb-2">
                             <span class="text-rose font-bold text-xs bg-rose/10 px-2 py-1 rounded-full"><i class="fas ${typeIcons[item.type] || 'fa-map-pin'} mr-1"></i>${item.type}</span>
                             <div class="flex gap-3 text-taupe items-center pointer-events-auto">
-                                ${mapBtn}
+                                ${item.mapUrl ? `<a href="${item.mapUrl}" target="_blank" class="p-1 text-rose active:scale-90 transition"><i class="fas fa-location-arrow"></i></a>` : ''}
                                 <button onclick="TripModule.openModal('${item.id}')" class="p-1 active:scale-90 transition"><i class="fas fa-edit"></i></button>
                                 <button onclick="TripModule.deleteItem('${item.id}')" class="p-1 active:scale-90 transition"><i class="fas fa-trash-alt"></i></button>
-                                <i class="fas fa-bars drag-handle cursor-grab active:cursor-grabbing text-lg ml-1"></i>
                             </div>
                         </div>
                         <h4 class="font-bold text-coffee text-base leading-tight mb-1 pointer-events-none">${item.name}</h4>`;
@@ -936,8 +949,6 @@
                         html += `</div>`;
                     }
                     if(item.note) html += `<div class="bg-white/50 text-coffee/80 text-sm p-2 rounded-xl mb-3 pointer-events-none whitespace-pre-line">${item.note}</div>`;
-                    
-                    // 絕對定位 top-full，並且留夠 mb-16 防遮擋
                     if(index < items.length - 1 && (item.transMethod || item.transTime)) {
                         const tIcon = transIcons[item.transMethod] || 'fa-arrow-right'; const tLabel = item.transMethod ? item.transMethod : '';
                         html += `
@@ -955,16 +966,6 @@
                     }
                     el.innerHTML = html; container.appendChild(el);
                 });
-
-                if (typeof Sortable !== 'undefined') {
-                    new Sortable(container, {
-                        handle: '.drag-handle', animation: 150, ghostClass: 'opacity-50',
-                        onEnd: (evt) => {
-                            const newArr = []; container.querySelectorAll('[data-id]').forEach(el => { newArr.push(items.find(i => i.id === el.dataset.id)); });
-                            appData.itinerary[appData.currentDateId] = newArr; saveData(); TripModule.renderItinerary();
-                        }
-                    });
-                }
             }
         };
 
@@ -973,7 +974,7 @@
         // ------------------------------------------
         const WalletModule = {
             currentExpenseDateId: null, editingExpId: null,
-            init: function() { this.currentExpenseDateId = appData.currentDateId || TRIP_DATES[0].id; this.renderExpenses(); },
+            init: function() { this.currentExpenseDateId = appData.currentDateId || appData.dates[0].id; this.renderExpenses(); },
             convertCurrency: function(source) {
                 const jpyEl = document.getElementById('calc-jpy'); const twdEl = document.getElementById('calc-twd');
                 if(source === 'jpy') { twdEl.value = isNaN(parseFloat(jpyEl.value)) ? '' : Math.round(parseFloat(jpyEl.value) * EX_RATE); }
@@ -981,7 +982,7 @@
             },
             renderDateSlider: function() {
                 const container = document.getElementById('expense-date-slider'); if(!container) return; container.innerHTML = '';
-                TRIP_DATES.forEach(d => {
+                appData.dates.forEach(d => {
                     const isActive = this.currentExpenseDateId === d.id; const btn = document.createElement('button'); btn.type = 'button';
                     btn.className = `flex-shrink-0 px-4 py-1.5 rounded-2xl font-num font-bold text-xs transition shadow-sm ${isActive ? 'bg-rose text-white' : 'bg-white text-taupe border border-[#E5E0DA]'}`;
                     btn.innerText = d.label; btn.onclick = () => { this.currentExpenseDateId = d.id; this.renderDateSlider(); }; container.appendChild(btn);
@@ -992,7 +993,7 @@
                 const titleEl = document.getElementById('expense-modal-title'); if (titleEl) titleEl.innerHTML = '<i class="fas fa-pen text-rose mr-2"></i>記一筆花費';
                 document.getElementById('exp-item').value = ''; document.getElementById('exp-amount').value = ''; document.getElementById('exp-split').value = '1';
                 document.getElementById('exp-currency').value = 'JPY'; document.getElementById('exp-method').value = '現金';
-                this.currentExpenseDateId = appData.currentDateId || TRIP_DATES[0].id; this.renderDateSlider(); openModal('modal-expense');
+                this.currentExpenseDateId = appData.currentDateId || appData.dates[0].id; this.renderDateSlider(); openModal('modal-expense');
             },
             editExpense: function(id) {
                 const exp = appData.expenses.find(e => e.id === id); if (!exp) return;
@@ -1001,8 +1002,8 @@
                 document.getElementById('exp-item').value = exp.item;
                 document.getElementById('exp-amount').value = (exp.currency === 'JPY' ? exp.totalJpy : exp.totalTwd) || exp.amount;
                 document.getElementById('exp-currency').value = exp.currency || 'JPY'; document.getElementById('exp-method').value = exp.method || '現金'; document.getElementById('exp-split').value = exp.split || 1;
-                const dateObj = TRIP_DATES.find(d => d.label === exp.date);
-                this.currentExpenseDateId = dateObj ? dateObj.id : (appData.currentDateId || TRIP_DATES[0].id);
+                const dateObj = appData.dates.find(d => d.label === exp.date);
+                this.currentExpenseDateId = dateObj ? dateObj.id : (appData.currentDateId || appData.dates[0].id);
                 this.renderDateSlider(); openModal('modal-expense');
             },
             saveExpense: function() {
@@ -1013,7 +1014,7 @@
                 const currency = document.getElementById('exp-currency').value; const method = document.getElementById('exp-method').value; const split = parseInt(document.getElementById('exp-split').value) || 1;
                 const totalTwd = currency === 'JPY' ? Math.round(amount * EX_RATE) : amount; const totalJpy = currency === 'JPY' ? amount : Math.round(amount / EX_RATE);
                 const myCostTwd = Math.round(totalTwd / split); const myCostJpy = Math.round(totalJpy / split);
-                const dateObj = TRIP_DATES.find(d => d.id === this.currentExpenseDateId); const dateLabel = dateObj ? dateObj.label : '未定';
+                const dateObj = appData.dates.find(d => d.id === this.currentExpenseDateId); const dateLabel = dateObj ? dateObj.label : '未定';
                 if (this.editingExpId) {
                     const idx = appData.expenses.findIndex(e => e.id === this.editingExpId);
                     if (idx !== -1) { appData.expenses[idx] = { ...appData.expenses[idx], date: dateLabel, item, amount, currency, method, split, myCostTwd, myCostJpy, totalJpy, totalTwd }; }
@@ -1040,7 +1041,7 @@
                     grouped[e.date].items.push({ ...e, costTwd, costJpy, tJpy }); grouped[e.date].totalTwd += costTwd; grouped[e.date].totalJpy += costJpy;
                 });
                 document.getElementById('total-expense-twd').innerHTML = `NT$ ${grandTotalTwd.toLocaleString()} <span class="text-lg text-taupe font-normal" id="total-expense-jpy">(¥ ${grandTotalJpy.toLocaleString()})</span>`;
-                const sortedDateKeys = Object.keys(grouped).sort((a, b) => TRIP_DATES.findIndex(d => d.label === a) - TRIP_DATES.findIndex(d => d.label === b));
+                const sortedDateKeys = Object.keys(grouped).sort((a, b) => appData.dates.findIndex(d => d.label === a) - appData.dates.findIndex(d => d.label === b));
                 sortedDateKeys.forEach(dateStr => {
                     const group = grouped[dateStr]; const groupEl = document.createElement('div'); groupEl.className = 'bg-cream p-5 rounded-3xl shadow-soft';
                     let innerHTML = `
@@ -1136,7 +1137,7 @@
         };
 
         // ------------------------------------------
-        // 共用導航切換
+        // 共用切換與控制
         // ------------------------------------------
         function switchTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(el => { el.classList.add('hidden'); el.classList.remove('flex', 'block'); });
@@ -1155,21 +1156,23 @@
         function closeModal(id) { const el = document.getElementById(id); if(el) el.classList.add('hidden'); }
 
         // ------------------------------------------
-        // 🚀 核心啟動程序 (使用 DOMContentLoaded 保證秒載入)
+        // 🚀 安全直接啟動程序 (立即執行，完全不等待 DOMContentLoaded)
         // ------------------------------------------
-        document.addEventListener('DOMContentLoaded', () => {
+        function initApp() {
             try {
                 HomeModule.init();
                 TripModule.init(); 
                 WalletModule.init(); 
                 ListModule.init();
-                
                 switchTab('home');
-
             } catch (err) { 
                 console.error("系統啟動發生錯誤:", err); 
             }
-        });
+        }
+        
+        // 確保在所有 DOM 元素準備好時，立即執行，根除手機瀏覽器攔截問題
+        document.addEventListener('DOMContentLoaded', initApp);
+        
     </script>
 </body>
 </html>
