@@ -94,6 +94,7 @@
                 <button onclick="HomeModule.switchHomeMode('drive')" id="btn-mode-drive" class="flex-1 py-2 text-center text-coffee z-10 font-bold transition-colors">自駕模式</button>
             </div>
 
+            <!-- 動態內容區 (由 JS 瞬間載入) -->
             <div id="home-dynamic-content" class="space-y-6"></div>
 
             <div class="bg-cream rounded-3xl p-5 shadow-soft">
@@ -107,7 +108,6 @@
                         <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-rose shadow-sm"><i class="fas fa-phone"></i></div>
                         <span class="text-xs font-bold">緊急聯絡</span>
                     </button>
-                    <!-- 退稅工具按鈕 -->
                     <button onclick="openModal('modal-tax')" class="flex flex-col items-center gap-2 p-3 bg-[#F0EBE6] rounded-2xl active:scale-95 transition-transform">
                         <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-rose shadow-sm"><i class="fas fa-coins"></i></div>
                         <span class="text-xs font-bold">退稅</span>
@@ -118,13 +118,10 @@
             <div class="bg-cream rounded-3xl p-5 shadow-soft">
                 <h3 class="font-bold text-coffee mb-4"><i class="fas fa-hotel text-rose mr-2"></i>住宿資訊</h3>
                 <input type="text" id="hotel-name" placeholder="輸入飯店名稱..." class="ins-input mb-3" onchange="saveData('hotelName', this.value)">
-                
-                <!-- 住宿截圖 -->
                 <div class="relative w-full h-32 bg-[#F0EBE6] rounded-2xl border-2 border-dashed border-taupe flex flex-col items-center justify-center overflow-hidden">
                     <input type="file" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" onchange="HomeModule.handleImageUpload(event, 'hotelImg')">
                     <i class="fas fa-cloud-upload-alt text-2xl text-taupe mb-1"></i>
                     <span class="text-xs text-taupe font-bold">上傳訂房憑證截圖</span>
-                    
                     <div id="hotelImg-container" class="absolute inset-0 hidden z-20">
                         <div id="hotelImg-preview" class="absolute inset-0 bg-cover bg-center select-none" style="-webkit-touch-callout: none; -webkit-user-select: none; user-select: none;"></div>
                         <button id="hotelImg-delete" onclick="HomeModule.deleteImage('hotelImg')" class="absolute top-2 right-2 bg-white/90 text-rose rounded-full w-8 h-8 flex items-center justify-center shadow-md hidden z-30 transition-transform active:scale-90"><i class="fas fa-times text-lg"></i></button>
@@ -137,14 +134,11 @@
         <!-- ==================== 2. 行程 (TRIP) ==================== -->
         <section id="tab-itinerary" class="p-5 space-y-4 tab-content hidden flex-col h-full">
             <h2 class="text-2xl font-bold font-num text-coffee pt-4 mb-2">Itinerary</h2>
-            
             <div class="flex overflow-x-auto gap-3 pb-2 hide-scrollbar snap-x" id="date-slider"></div>
-
             <div class="flex justify-between items-center mt-2">
                 <span class="text-sm font-bold text-taupe" id="current-date-display"></span>
                 <button onclick="TripModule.openModal()" class="bg-coffee text-white px-4 py-1.5 rounded-full text-sm font-bold shadow-md active:scale-95 transition"><i class="fas fa-plus mr-1"></i>新增</button>
             </div>
-
             <p class="text-[10px] text-taupe text-right"><i class="fas fa-info-circle mr-1"></i>長按卡片即可開啟排序</p>
             <div id="itinerary-list" class="space-y-4 pb-10 min-h-[50vh] relative"></div>
         </section>
@@ -445,11 +439,11 @@
     <!-- ====== JavaScript 邏輯 ====== -->
     <script>
         // ------------------------------------------
-        // 核心資料狀態管理
+        // 核心資料狀態管理與極致防撞網 (防白畫面)
         // ------------------------------------------
         const APP_KEY = 'insTravelApp';
         const EX_RATE = 0.21;
-        const APP_VERSION = '3.5'; // 版本升級：無痛導入最新行程表
+        const APP_VERSION = '4.2'; // 強制推送 12/24 與 12/26, 12/27 的新行程與修復
 
         const TRIP_DATES = Object.freeze([
             { id: '12-22', label: 'Tue 22' }, { id: '12-23', label: 'Wed 23' }, { id: '12-24', label: 'Thu 24' },
@@ -504,24 +498,22 @@
             ]
         });
 
-        const defaultState = Object.freeze({
+        const defaultState = {
             version: APP_VERSION,
             homeMode: 'entry', 
             vjwMember: 'personal', vjwImg_personal: '', vjwImg_child: '',
             parkingImg: '', hotelName: '', hotelImg: '',
-            currentDateId: TRIP_DATES[0].id, 
-            dates: TRIP_DATES, 
-            itinerary: defaultItinerary, 
-            expenses:[], memo: '', shopping: [], taxMemo: '', 
+            currentDateId: TRIP_DATES[0].id, dates: TRIP_DATES, itinerary: defaultItinerary, expenses:[], memo: '', shopping:[],
+            taxMemo: '', 
             todos:[ 
                 { id: 1, text: '護照 (效期6個月以上)', done: false, category: 'carry' }, 
                 { id: 2, text: '日幣現金與信用卡', done: false, category: 'carry' },
                 { id: 3, text: '行動電源 (不可托運)', done: false, category: 'cabin' },
                 { id: 4, text: '換洗衣物', done: false, category: 'checked' }
             ]
-        });
+        };
 
-        let appData = JSON.parse(JSON.stringify(defaultState));
+        let appData = { ...defaultState };
 
         try {
             const savedStr = localStorage.getItem(APP_KEY);
@@ -529,39 +521,47 @@
                 const parsed = JSON.parse(savedStr);
                 if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
                     if (parsed.version !== APP_VERSION) {
-                        // 【核心無痛升級機制】
-                        // 保留使用者的記帳、清單與照片，只強制覆蓋最新版的行程表與版本號
-                        console.log("偵測到版本更新，套用新版行程表，同時保留您的其他資料。");
-                        appData = { 
-                            ...defaultState, 
-                            ...parsed, 
-                            version: APP_VERSION,
-                            itinerary: JSON.parse(JSON.stringify(defaultItinerary)) // 強制套用最新行程
-                        };
-                        localStorage.setItem(APP_KEY, JSON.stringify(appData));
+                        console.log("版本升級，套用全新預設，強制修復所有潛在錯誤。");
+                        localStorage.setItem(APP_KEY, JSON.stringify(defaultState));
                     } else {
-                        appData = { ...appData, ...parsed };
-                        appData.todos = Array.isArray(appData.todos) ? appData.todos : JSON.parse(JSON.stringify(defaultState.todos));
-                        appData.expenses = Array.isArray(appData.expenses) ? appData.expenses :[];
-                        appData.shopping = Array.isArray(appData.shopping) ? appData.shopping :[];
-                        appData.itinerary = (typeof appData.itinerary === 'object' && appData.itinerary !== null) ? appData.itinerary : JSON.parse(JSON.stringify(defaultState.itinerary));
+                        appData = { ...defaultState, ...parsed };
+                        
+                        if (appData.vjwImg && !appData.vjwImg_personal) appData.vjwImg_personal = appData.vjwImg;
+                        
+                        appData.todos = Array.isArray(appData.todos) ? appData.todos : defaultState.todos;
+                        appData.expenses = Array.isArray(appData.expenses) ? appData.expenses : defaultState.expenses;
+                        appData.shopping = Array.isArray(appData.shopping) ? appData.shopping : defaultState.shopping;
+                        
+                        // 強制保證行程結構的完整性
+                        if (typeof appData.itinerary !== 'object' || appData.itinerary === null) {
+                            appData.itinerary = JSON.parse(JSON.stringify(defaultItinerary));
+                        } else {
+                            appData.dates.forEach(d => {
+                                if (!appData.itinerary[d.id]) {
+                                    appData.itinerary[d.id] = defaultItinerary[d.id] ? JSON.parse(JSON.stringify(defaultItinerary[d.id])) :[];
+                                }
+                            });
+                        }
                     }
                 }
             }
         } catch (e) {
-            console.error("Storage Error, resetting securely.");
+            console.error("Storage Error, resetting defaults.");
+            appData = { ...defaultState };
         }
 
         function saveData(key, value) {
             if(key) appData[key] = value;
-            try { localStorage.setItem(APP_KEY, JSON.stringify(appData)); } catch (err) { console.warn("Save Error", err); }
+            try {
+                localStorage.setItem(APP_KEY, JSON.stringify(appData));
+            } catch (err) {
+                console.warn("Save Error", err);
+            }
         }
 
-        // ==========================================
-        // 📦 模組區 (Sealed Modules)
-        // ==========================================
-        
-        // --- 🏠 HomeModule ---
+        // ------------------------------------------
+        // 🏠 HOME 首頁模組
+        // ------------------------------------------
         const HomeModule = {
             init: function() {
                 this.switchHomeMode(appData.homeMode || 'entry');
@@ -575,19 +575,23 @@
                     }
                 });
             },
+            
             switchHomeMode: function(mode) {
                 appData.homeMode = mode; saveData();
                 const slider = document.getElementById('mode-slider');
                 const btnEntry = document.getElementById('btn-mode-entry'); 
                 const btnDrive = document.getElementById('btn-mode-drive');
                 const content = document.getElementById('home-dynamic-content');
+
                 if (!content) return; 
 
                 if(mode === 'entry') {
                     if(slider) slider.style.transform = 'translateX(0)';
                     if(btnEntry) btnEntry.className = 'flex-1 py-2 text-center text-white z-10 font-bold transition-colors';
                     if(btnDrive) btnDrive.className = 'flex-1 py-2 text-center text-coffee z-10 font-bold transition-colors';
+                    
                     const member = appData.vjwMember || 'personal';
+
                     content.innerHTML = `
                         <div class="bg-cream rounded-3xl p-5 shadow-soft space-y-4">
                             <div class="flex justify-between items-center">
@@ -596,16 +600,19 @@
                                     <i class="fas fa-external-link-alt"></i> 官網連結
                                 </a>
                             </div>
+                            
                             <div class="flex gap-2 bg-[#F0EBE6] p-1 rounded-2xl">
                                 <button onclick="HomeModule.switchVjwMember('personal')" id="btn-vjw-personal" class="flex-1 py-1.5 text-sm font-bold rounded-xl transition">個人</button>
                                 <button onclick="HomeModule.switchVjwMember('child')" id="btn-vjw-child" class="flex-1 py-1.5 text-sm font-bold rounded-xl transition">小孩</button>
                             </div>
+
                             <div class="relative w-full h-56 bg-[#F0EBE6] rounded-2xl border-2 border-dashed border-taupe flex flex-col items-center justify-center overflow-hidden">
                                 <input type="file" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" onchange="HomeModule.handleVjwUpload(event)">
                                 <div id="vjw-upload-placeholder" class="flex flex-col items-center justify-center pointer-events-none z-0">
                                     <i class="fas fa-camera text-3xl text-taupe mb-2"></i>
                                     <span class="text-sm text-taupe font-bold">點擊上傳 <span id="vjw-member-label" class="text-rose">個人</span> QR Code</span>
                                 </div>
+                                
                                 <div id="vjwImg-container" class="absolute inset-0 hidden z-20">
                                     <div id="vjwImg-preview" class="absolute inset-0 bg-contain bg-no-repeat bg-center select-none" style="-webkit-touch-callout: none; -webkit-user-select: none; user-select: none;"></div>
                                     <button id="vjwImg-delete" onclick="HomeModule.deleteVjwImage()" class="absolute top-2 right-2 bg-white/90 text-rose rounded-full w-8 h-8 flex items-center justify-center shadow-md hidden z-30 transition-transform active:scale-90"><i class="fas fa-times text-lg"></i></button>
@@ -613,11 +620,14 @@
                             </div>
                             <p class="text-[10px] text-taupe text-center mt-2"><i class="fas fa-info-circle mr-1"></i>提示：長按圖片可刪除 / 雙擊可放大</p>
                         </div>`;
+                        
                     this.switchVjwMember(member);
+
                 } else {
                     if(slider) slider.style.transform = 'translateX(100%)';
                     if(btnDrive) btnDrive.className = 'flex-1 py-2 text-center text-white z-10 font-bold transition-colors';
                     if(btnEntry) btnEntry.className = 'flex-1 py-2 text-center text-coffee z-10 font-bold transition-colors';
+                    
                     content.innerHTML = `
                         <div class="bg-cream rounded-3xl p-5 shadow-soft mb-4">
                             <h3 class="font-bold text-coffee mb-4"><i class="fas fa-car text-rose mr-2"></i>停車位置筆記</h3>
@@ -625,6 +635,7 @@
                                 <input type="file" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" onchange="HomeModule.handleImageUpload(event, 'parkingImg')">
                                 <i class="fas fa-parking text-3xl text-taupe mb-2"></i>
                                 <span class="text-sm text-taupe font-bold">拍下車位號碼</span>
+                                
                                 <div id="parkingImg-container" class="absolute inset-0 hidden z-20">
                                     <div id="parkingImg-preview" class="absolute inset-0 bg-cover bg-center select-none" style="-webkit-touch-callout: none; -webkit-user-select: none; user-select: none;"></div>
                                     <button id="parkingImg-delete" onclick="HomeModule.deleteImage('parkingImg')" class="absolute top-2 right-2 bg-white/90 text-rose rounded-full w-8 h-8 flex items-center justify-center shadow-md hidden z-30 transition-transform active:scale-90"><i class="fas fa-times text-lg"></i></button>
@@ -644,10 +655,13 @@
                     if(appData.parkingImg) this.showImagePreview('parkingImg', appData.parkingImg);
                 }
             },
+
             switchVjwMember: function(member) {
                 appData.vjwMember = member; saveData();
-                const btnP = document.getElementById('btn-vjw-personal'); const btnC = document.getElementById('btn-vjw-child');
-                const label = document.getElementById('vjw-member-label'); const preview = document.getElementById('vjwImg-preview');
+                const btnP = document.getElementById('btn-vjw-personal');
+                const btnC = document.getElementById('btn-vjw-child');
+                const label = document.getElementById('vjw-member-label');
+                const preview = document.getElementById('vjwImg-preview');
                 const placeholder = document.getElementById('vjw-upload-placeholder');
                 const container = document.getElementById('vjwImg-container');
 
@@ -664,118 +678,193 @@
                 if(preview && placeholder && container) {
                     if(currentImg) {
                         preview.style.backgroundImage = `url(${currentImg})`;
-                        container.classList.remove('hidden'); placeholder.classList.add('hidden');
+                        container.classList.remove('hidden');
+                        placeholder.classList.add('hidden');
                         this.bindImageEvents('vjwImg', currentImg);
-                        const delBtn = document.getElementById('vjwImg-delete'); if (delBtn) delBtn.classList.add('hidden');
+                        const delBtn = document.getElementById('vjwImg-delete');
+                        if (delBtn) delBtn.classList.add('hidden');
                     } else {
-                        container.classList.add('hidden'); preview.style.backgroundImage = ''; placeholder.classList.remove('hidden');
+                        container.classList.add('hidden');
+                        preview.style.backgroundImage = '';
+                        placeholder.classList.remove('hidden');
                     }
                 }
             },
+
             handleVjwUpload: function(event) {
-                const file = event.target.files[0]; if(!file) return; const reader = new FileReader();
+                const file = event.target.files[0]; if(!file) return;
+                const reader = new FileReader();
                 reader.onload = (e) => {
-                    const img = new Image(); img.onload = () => {
-                        const canvas = document.createElement('canvas'); const MAX_WIDTH = 600; let width = img.width; let height = img.height;
+                    const img = new Image();
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        const MAX_WIDTH = 600; let width = img.width; let height = img.height;
                         if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
-                        canvas.width = width; canvas.height = height; const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, width, height);
+                        canvas.width = width; canvas.height = height;
+                        const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, width, height);
                         const dataUrl = canvas.toDataURL('image/jpeg', 0.6);
-                        const member = appData.vjwMember || 'personal'; appData['vjwImg_' + member] = dataUrl; saveData();
+                        
+                        const member = appData.vjwMember || 'personal';
+                        appData['vjwImg_' + member] = dataUrl; saveData();
                         this.switchVjwMember(member);
                     }; img.src = e.target.result;
                 }; reader.readAsDataURL(file);
             },
+
             handleImageUpload: function(event, key) {
-                const file = event.target.files[0]; if(!file) return; const reader = new FileReader();
+                const file = event.target.files[0]; if(!file) return;
+                const reader = new FileReader();
                 reader.onload = (e) => {
-                    const img = new Image(); img.onload = () => {
-                        const canvas = document.createElement('canvas'); const MAX_WIDTH = 600; let width = img.width; let height = img.height;
+                    const img = new Image();
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        const MAX_WIDTH = 600; let width = img.width; let height = img.height;
                         if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
-                        canvas.width = width; canvas.height = height; const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, width, height);
-                        const dataUrl = canvas.toDataURL('image/jpeg', 0.6); appData[key] = dataUrl; saveData(); 
+                        canvas.width = width; canvas.height = height;
+                        const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, width, height);
+                        const dataUrl = canvas.toDataURL('image/jpeg', 0.6);
+                        appData[key] = dataUrl; saveData(); 
                         this.showImagePreview(key, dataUrl);
                     }; img.src = e.target.result;
                 }; reader.readAsDataURL(file);
             },
+            
             showImagePreview: function(key, dataUrl) { 
-                const container = document.getElementById(`${key}-container`); const preview = document.getElementById(`${key}-preview`);
+                const container = document.getElementById(`${key}-container`);
+                const preview = document.getElementById(`${key}-preview`);
                 if(container && preview) { 
                     if (dataUrl) {
-                        preview.style.backgroundImage = `url(${dataUrl})`; container.classList.remove('hidden');
+                        preview.style.backgroundImage = `url(${dataUrl})`; 
+                        container.classList.remove('hidden');
                         this.bindImageEvents(key, dataUrl);
-                        const delBtn = document.getElementById(`${key}-delete`); if (delBtn) delBtn.classList.add('hidden');
+                        const delBtn = document.getElementById(`${key}-delete`);
+                        if (delBtn) delBtn.classList.add('hidden');
                     } else {
-                        container.classList.add('hidden'); preview.style.backgroundImage = '';
+                        container.classList.add('hidden');
+                        preview.style.backgroundImage = '';
                     }
                 } 
             },
+
             deleteImage: function(key) {
                 if(!confirm('確定要移除這張圖片嗎？')) return;
-                appData[key] = ''; saveData(); this.showImagePreview(key, '');
+                appData[key] = ''; saveData();
+                this.showImagePreview(key, '');
             },
+
             deleteVjwImage: function() {
                 if(!confirm('確定要移除這張圖片嗎？')) return;
-                const member = appData.vjwMember || 'personal'; appData['vjwImg_' + member] = ''; saveData();
+                const member = appData.vjwMember || 'personal';
+                appData['vjwImg_' + member] = ''; saveData();
                 this.switchVjwMember(member);
             },
+
             bindImageEvents: function(key, dataUrl) {
-                const preview = document.getElementById(`${key}-preview`); if (!preview) return;
-                const newPreview = preview.cloneNode(true); preview.parentNode.replaceChild(newPreview, preview);
-                let timer; let lastTap = 0; let isLongPress = false;
+                const preview = document.getElementById(`${key}-preview`);
+                if (!preview) return;
+                
+                const newPreview = preview.cloneNode(true);
+                preview.parentNode.replaceChild(newPreview, preview);
+                
+                let timer;
+                let lastTap = 0;
+                let isLongPress = false;
 
                 const showDelete = () => {
                     if (navigator.vibrate) navigator.vibrate(50);
-                    const delBtn = document.getElementById(`${key}-delete`); if (delBtn) delBtn.classList.remove('hidden');
+                    const delBtn = document.getElementById(`${key}-delete`);
+                    if (delBtn) delBtn.classList.remove('hidden');
                 };
+
                 const hideDelete = () => {
                     const delBtn = document.getElementById(`${key}-delete`);
-                    if (delBtn && !delBtn.classList.contains('hidden')) { delBtn.classList.add('hidden'); return true; }
+                    if (delBtn && !delBtn.classList.contains('hidden')) {
+                        delBtn.classList.add('hidden');
+                        return true;
+                    }
                     return false;
                 };
                 
                 newPreview.addEventListener('touchstart', (e) => {
-                    isLongPress = false; timer = setTimeout(() => { isLongPress = true; showDelete(); }, 500);
+                    isLongPress = false;
+                    timer = setTimeout(() => { 
+                        isLongPress = true;
+                        showDelete(); 
+                    }, 500);
                 });
                 newPreview.addEventListener('touchmove', () => { clearTimeout(timer); });
                 newPreview.addEventListener('touchend', (e) => {
                     clearTimeout(timer);
-                    if (isLongPress) { if(e.cancelable) e.preventDefault(); return; }
-                    const currentTime = new Date().getTime(); const tapLength = currentTime - lastTap;
-                    if (tapLength < 300 && tapLength > 0) { HomeModule.showFullScreenImage(dataUrl); if(e.cancelable) e.preventDefault(); } 
-                    else { if(hideDelete()) { if(e.cancelable) e.preventDefault(); } }
+                    if (isLongPress) {
+                        if(e.cancelable) e.preventDefault();
+                        return;
+                    }
+                    
+                    const currentTime = new Date().getTime();
+                    const tapLength = currentTime - lastTap;
+                    
+                    if (tapLength < 300 && tapLength > 0) {
+                        HomeModule.showFullScreenImage(dataUrl);
+                        if(e.cancelable) e.preventDefault();
+                    } else {
+                        if(hideDelete()) { if(e.cancelable) e.preventDefault(); }
+                    }
                     lastTap = currentTime;
                 });
                 
                 newPreview.addEventListener('mousedown', (e) => {
-                    if(e.button !== 0) return; isLongPress = false; timer = setTimeout(() => { isLongPress = true; showDelete(); }, 500);
+                    if(e.button !== 0) return; 
+                    isLongPress = false;
+                    timer = setTimeout(() => { 
+                        isLongPress = true;
+                        showDelete(); 
+                    }, 500);
                 });
-                newPreview.addEventListener('mouseup', (e) => { clearTimeout(timer); if (isLongPress && e.cancelable) e.preventDefault(); });
+                newPreview.addEventListener('mouseup', (e) => { 
+                    clearTimeout(timer); 
+                    if (isLongPress && e.cancelable) e.preventDefault();
+                });
                 newPreview.addEventListener('mousemove', () => clearTimeout(timer));
                 newPreview.addEventListener('mouseleave', () => { clearTimeout(timer); hideDelete(); });
                 newPreview.addEventListener('dblclick', () => { HomeModule.showFullScreenImage(dataUrl); });
-                newPreview.addEventListener('contextmenu', e => e.preventDefault());
+                newPreview.addEventListener('contextmenu', e => { if (e.cancelable) e.preventDefault(); });
             },
+
             showFullScreenImage: function(dataUrl) {
                 const img = document.getElementById('fs-image-view');
-                if(img) { img.src = dataUrl; openModal('modal-image-fullscreen'); }
+                if(img) {
+                    img.src = dataUrl;
+                    openModal('modal-image-fullscreen');
+                }
             },
+
             updateTaxMemo: function(init = false) {
-                const mInput = document.getElementById('tax-memo-input'); const preview = document.getElementById('tax-memo-preview');
+                const mInput = document.getElementById('tax-memo-input'); 
+                const preview = document.getElementById('tax-memo-preview');
                 if(!mInput || !preview) return;
                 if(init) { mInput.value = appData.taxMemo || ''; } else { appData.taxMemo = mInput.value; saveData(); }
-                const htmlText = (appData.taxMemo || '').replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/(https?:\/\/[^\s]+)/g, url => `<br><a href="${url}" target="_blank" class="inline-flex items-center mt-1 px-4 py-1.5 bg-rose text-white rounded-full text-xs shadow-sm font-bold active:scale-95 transition"><i class="fas fa-link mr-1"></i> 開啟連結</a><br>`);
+                
+                const rawText = appData.taxMemo || '';
+                const escapedText = rawText.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+                const htmlText = escapedText.replace(/(https?:\/\/[^\s]+)/g, url => `<br><a href="${url}" target="_blank" class="inline-flex items-center mt-1 px-4 py-1.5 bg-rose text-white rounded-full text-xs shadow-sm font-bold active:scale-95 transition"><i class="fas fa-link mr-1"></i> 開啟連結</a><br>`);
                 preview.innerHTML = htmlText || '<span class="text-taupe">預覽區...</span>';
             },
+
             showFullScreenJp: function(zh, ja, ro) {
-                document.getElementById('fs-jp-zh').innerText = zh; document.getElementById('fs-jp-ja').innerText = ja; document.getElementById('fs-jp-ro').innerText = ro;
+                document.getElementById('fs-jp-zh').innerText = zh;
+                document.getElementById('fs-jp-ja').innerText = ja;
+                document.getElementById('fs-jp-ro').innerText = ro;
                 openModal('modal-jp-fullscreen');
             }
         };
 
-        // --- 🧳 TripModule ---
+        // ------------------------------------------
+        // 🧳 TRIP 行程模組
+        // ------------------------------------------
         const TripModule = {
             currentTransMethod: '', editingItiId: null,
             reorderingId: null, longPressTimer: null,
+            
             init: function() {
                 appData.dates = appData.dates || TRIP_DATES;
                 if(!appData.dates.find(d => d.id === appData.currentDateId)) appData.currentDateId = appData.dates[0].id;
@@ -794,9 +883,12 @@
             renderDateSlider: function() {
                 const container = document.getElementById('date-slider'); container.innerHTML = '';
                 appData.dates.forEach(d => {
-                    const isActive = appData.currentDateId === d.id; const btn = document.createElement('button');
+                    const isActive = appData.currentDateId === d.id;
+                    const btn = document.createElement('button');
                     btn.className = `flex-shrink-0 px-4 py-2 rounded-2xl font-num font-bold text-sm transition shadow-sm ${isActive ? 'bg-coffee text-white' : 'bg-cream text-taupe border border-[#E5E0DA]'}`;
-                    btn.innerText = d.label; btn.onclick = () => { appData.currentDateId = d.id; saveData(); this.renderDateSlider(); this.renderItinerary(); }; container.appendChild(btn);
+                    btn.innerText = d.label;
+                    btn.onclick = () => { appData.currentDateId = d.id; saveData(); this.renderDateSlider(); this.renderItinerary(); };
+                    container.appendChild(btn);
                 });
                 const activeDate = appData.dates.find(d => d.id === appData.currentDateId);
                 const disp = document.getElementById('current-date-display'); if(disp) disp.innerText = activeDate ? activeDate.label : '';
@@ -837,10 +929,13 @@
                 appData.itinerary[appData.currentDateId] = appData.itinerary[appData.currentDateId].filter(i => i.id !== id);
                 saveData(); this.renderItinerary();
             },
+            
             handleTouchStart: function(e, id) {
                 if(e.target.closest('button') || e.target.closest('a')) return;
                 this.longPressTimer = setTimeout(() => {
-                    this.reorderingId = id; if (navigator.vibrate) navigator.vibrate(50); this.renderItinerary();
+                    this.reorderingId = id;
+                    if (navigator.vibrate) navigator.vibrate(50);
+                    this.renderItinerary();
                 }, 500);
             },
             handleTouchCancel: function() {
@@ -848,14 +943,23 @@
             },
             moveUp: function(id, e) {
                 if(e) e.stopPropagation();
-                const items = appData.itinerary[appData.currentDateId]; const idx = items.findIndex(i => i.id === id);
-                if(idx > 0) { const temp = items[idx]; items[idx] = items[idx - 1]; items[idx - 1] = temp; saveData(); this.renderItinerary(); }
+                const items = appData.itinerary[appData.currentDateId];
+                const idx = items.findIndex(i => i.id === id);
+                if(idx > 0) {
+                    const temp = items[idx]; items[idx] = items[idx - 1]; items[idx - 1] = temp;
+                    saveData(); this.renderItinerary();
+                }
             },
             moveDown: function(id, e) {
                 if(e) e.stopPropagation();
-                const items = appData.itinerary[appData.currentDateId]; const idx = items.findIndex(i => i.id === id);
-                if(idx < items.length - 1) { const temp = items[idx]; items[idx] = items[idx + 1]; items[idx + 1] = temp; saveData(); this.renderItinerary(); }
+                const items = appData.itinerary[appData.currentDateId];
+                const idx = items.findIndex(i => i.id === id);
+                if(idx < items.length - 1) {
+                    const temp = items[idx]; items[idx] = items[idx + 1]; items[idx + 1] = temp;
+                    saveData(); this.renderItinerary();
+                }
             },
+
             renderItinerary: function() {
                 const container = document.getElementById('itinerary-list'); container.innerHTML = '';
                 const items = appData.itinerary[appData.currentDateId] ||[];
@@ -864,7 +968,8 @@
                 }
 
                 if (this.reorderingId) {
-                    const overlay = document.createElement('div'); overlay.className = 'fixed inset-0 z-30 bg-coffee/5 backdrop-blur-[1px]';
+                    const overlay = document.createElement('div');
+                    overlay.className = 'fixed inset-0 z-30 bg-coffee/5 backdrop-blur-[1px]';
                     overlay.onclick = () => { this.reorderingId = null; this.renderItinerary(); };
                     overlay.addEventListener('touchstart', (e) => { e.preventDefault(); this.reorderingId = null; this.renderItinerary(); });
                     container.appendChild(overlay);
@@ -874,16 +979,23 @@
                 const transIcons = { '飛機':'fa-plane', '電車':'fa-train', '汽車':'fa-car', '步行':'fa-walking' };
                 
                 items.forEach((item, index) => {
-                    const el = document.createElement('div'); const isReordering = this.reorderingId === item.id;
+                    const el = document.createElement('div'); 
+                    const isReordering = this.reorderingId === item.id;
+                    
                     el.style.zIndex = isReordering ? 50 : (40 - index); 
                     el.className = `bg-cream rounded-3xl p-4 shadow-sm relative group transition-all duration-300 select-none ${isReordering ? 'ring-4 ring-rose/40 scale-[1.02] shadow-xl' : ''}`; 
                     el.dataset.id = item.id;
+                    
                     el.style.webkitUserSelect = 'none'; el.style.userSelect = 'none'; el.style.webkitTouchCallout = 'none';
                     
-                    el.addEventListener('touchstart', (e) => this.handleTouchStart(e, item.id)); el.addEventListener('touchmove', () => this.handleTouchCancel());
-                    el.addEventListener('touchend', () => this.handleTouchCancel()); el.addEventListener('mousedown', (e) => this.handleTouchStart(e, item.id));
-                    el.addEventListener('mousemove', () => this.handleTouchCancel()); el.addEventListener('mouseup', () => this.handleTouchCancel());
-                    el.addEventListener('mouseleave', () => this.handleTouchCancel()); el.addEventListener('contextmenu', e => { if(this.longPressTimer || this.reorderingId) e.preventDefault(); });
+                    el.addEventListener('touchstart', (e) => this.handleTouchStart(e, item.id));
+                    el.addEventListener('touchmove', () => this.handleTouchCancel());
+                    el.addEventListener('touchend', () => this.handleTouchCancel());
+                    el.addEventListener('mousedown', (e) => this.handleTouchStart(e, item.id));
+                    el.addEventListener('mousemove', () => this.handleTouchCancel());
+                    el.addEventListener('mouseup', () => this.handleTouchCancel());
+                    el.addEventListener('mouseleave', () => this.handleTouchCancel());
+                    el.addEventListener('contextmenu', e => { if(this.longPressTimer || this.reorderingId) e.preventDefault(); });
 
                     let actionHtml = '';
                     if (isReordering) {
@@ -892,7 +1004,8 @@
                                 <button onclick="TripModule.moveUp('${item.id}', event)" class="${index === 0 ? 'opacity-30' : 'active:scale-90'} text-xl transition"><i class="fas fa-arrow-up"></i></button>
                                 <div class="w-px h-4 bg-rose/30"></div>
                                 <button onclick="TripModule.moveDown('${item.id}', event)" class="${index === items.length - 1 ? 'opacity-30' : 'active:scale-90'} text-xl transition"><i class="fas fa-arrow-down"></i></button>
-                            </div>`;
+                            </div>
+                        `;
                     } else {
                         let mapBtn = item.mapUrl ? `<a href="${item.mapUrl}" target="_blank" class="p-1 text-rose active:scale-90 transition"><i class="fas fa-location-arrow"></i></a>` : '';
                         actionHtml = `
@@ -900,7 +1013,8 @@
                                 ${mapBtn}
                                 <button onclick="TripModule.openModal('${item.id}')" class="p-1 active:scale-90 transition"><i class="fas fa-edit"></i></button>
                                 <button onclick="TripModule.deleteItem('${item.id}')" class="p-1 active:scale-90 transition"><i class="fas fa-trash-alt"></i></button>
-                            </div>`;
+                            </div>
+                        `;
                     }
 
                     let html = `
@@ -927,7 +1041,8 @@
                                     <i class="fas ${tIcon} ${tLabel ? 'mr-1' : ''}"></i>${tLabel} ${item.transTime || ''}
                                 </span>
                                 <div class="w-px flex-1 border-l-2 border-dashed border-taupe/60"></div>
-                            </div>`;
+                            </div>
+                        `;
                         el.classList.add('mb-16');
                     } else {
                         el.classList.add('mb-4');
@@ -937,10 +1052,17 @@
             }
         };
 
-        // --- 💰 WalletModule ---
+        // ------------------------------------------
+        // 💰 WALLET 記帳模組
+        // ------------------------------------------
         const WalletModule = {
-            currentExpenseDateId: null, editingExpId: null,
-            init: function() { this.currentExpenseDateId = appData.currentDateId || appData.dates[0].id; this.renderExpenses(); },
+            currentExpenseDateId: null,
+            editingExpId: null,
+
+            init: function() { 
+                this.currentExpenseDateId = appData.currentDateId || TRIP_DATES[0].id; 
+                this.renderExpenses(); 
+            },
             convertCurrency: function(source) {
                 const jpyEl = document.getElementById('calc-jpy'); const twdEl = document.getElementById('calc-twd');
                 if(source === 'jpy') { twdEl.value = isNaN(parseFloat(jpyEl.value)) ? '' : Math.round(parseFloat(jpyEl.value) * EX_RATE); }
@@ -948,7 +1070,7 @@
             },
             renderDateSlider: function() {
                 const container = document.getElementById('expense-date-slider'); if(!container) return; container.innerHTML = '';
-                appData.dates.forEach(d => {
+                TRIP_DATES.forEach(d => {
                     const isActive = this.currentExpenseDateId === d.id; const btn = document.createElement('button'); btn.type = 'button';
                     btn.className = `flex-shrink-0 px-4 py-1.5 rounded-2xl font-num font-bold text-xs transition shadow-sm ${isActive ? 'bg-rose text-white' : 'bg-white text-taupe border border-[#E5E0DA]'}`;
                     btn.innerText = d.label; btn.onclick = () => { this.currentExpenseDateId = d.id; this.renderDateSlider(); }; container.appendChild(btn);
@@ -959,7 +1081,7 @@
                 const titleEl = document.getElementById('expense-modal-title'); if (titleEl) titleEl.innerHTML = '<i class="fas fa-pen text-rose mr-2"></i>記一筆花費';
                 document.getElementById('exp-item').value = ''; document.getElementById('exp-amount').value = ''; document.getElementById('exp-split').value = '1';
                 document.getElementById('exp-currency').value = 'JPY'; document.getElementById('exp-method').value = '現金';
-                this.currentExpenseDateId = appData.currentDateId || appData.dates[0].id; this.renderDateSlider(); openModal('modal-expense');
+                this.currentExpenseDateId = appData.currentDateId || TRIP_DATES[0].id; this.renderDateSlider(); openModal('modal-expense');
             },
             editExpense: function(id) {
                 const exp = appData.expenses.find(e => e.id === id); if (!exp) return;
@@ -968,8 +1090,8 @@
                 document.getElementById('exp-item').value = exp.item;
                 document.getElementById('exp-amount').value = (exp.currency === 'JPY' ? exp.totalJpy : exp.totalTwd) || exp.amount;
                 document.getElementById('exp-currency').value = exp.currency || 'JPY'; document.getElementById('exp-method').value = exp.method || '現金'; document.getElementById('exp-split').value = exp.split || 1;
-                const dateObj = appData.dates.find(d => d.label === exp.date);
-                this.currentExpenseDateId = dateObj ? dateObj.id : (appData.currentDateId || appData.dates[0].id);
+                const dateObj = TRIP_DATES.find(d => d.label === exp.date);
+                this.currentExpenseDateId = dateObj ? dateObj.id : (appData.currentDateId || TRIP_DATES[0].id);
                 this.renderDateSlider(); openModal('modal-expense');
             },
             saveExpense: function() {
@@ -980,7 +1102,7 @@
                 const currency = document.getElementById('exp-currency').value; const method = document.getElementById('exp-method').value; const split = parseInt(document.getElementById('exp-split').value) || 1;
                 const totalTwd = currency === 'JPY' ? Math.round(amount * EX_RATE) : amount; const totalJpy = currency === 'JPY' ? amount : Math.round(amount / EX_RATE);
                 const myCostTwd = Math.round(totalTwd / split); const myCostJpy = Math.round(totalJpy / split);
-                const dateObj = appData.dates.find(d => d.id === this.currentExpenseDateId); const dateLabel = dateObj ? dateObj.label : '未定';
+                const dateObj = TRIP_DATES.find(d => d.id === this.currentExpenseDateId); const dateLabel = dateObj ? dateObj.label : '未定';
                 if (this.editingExpId) {
                     const idx = appData.expenses.findIndex(e => e.id === this.editingExpId);
                     if (idx !== -1) { appData.expenses[idx] = { ...appData.expenses[idx], date: dateLabel, item, amount, currency, method, split, myCostTwd, myCostJpy, totalJpy, totalTwd }; }
@@ -1007,7 +1129,7 @@
                     grouped[e.date].items.push({ ...e, costTwd, costJpy, tJpy }); grouped[e.date].totalTwd += costTwd; grouped[e.date].totalJpy += costJpy;
                 });
                 document.getElementById('total-expense-twd').innerHTML = `NT$ ${grandTotalTwd.toLocaleString()} <span class="text-lg text-taupe font-normal" id="total-expense-jpy">(¥ ${grandTotalJpy.toLocaleString()})</span>`;
-                const sortedDateKeys = Object.keys(grouped).sort((a, b) => appData.dates.findIndex(d => d.label === a) - appData.dates.findIndex(d => d.label === b));
+                const sortedDateKeys = Object.keys(grouped).sort((a, b) => TRIP_DATES.findIndex(d => d.label === a) - TRIP_DATES.findIndex(d => d.label === b));
                 sortedDateKeys.forEach(dateStr => {
                     const group = grouped[dateStr]; const groupEl = document.createElement('div'); groupEl.className = 'bg-cream p-5 rounded-3xl shadow-soft';
                     let innerHTML = `
@@ -1041,7 +1163,9 @@
             }
         };
 
-        // --- ✅ ListModule ---
+        // ------------------------------------------
+        // ✅ LISTS 清單模組
+        // ------------------------------------------
         const ListModule = {
             currentTodoCat: 'carry', tempShopImg: '',
             init: function() { appData.todos.forEach(t => { if(!t.category) t.category = 'carry'; }); this.renderTodos(); this.renderShoppingList(); this.updateMemo(true); },
@@ -1120,9 +1244,9 @@
         function closeModal(id) { const el = document.getElementById(id); if(el) el.classList.add('hidden'); }
 
         // ------------------------------------------
-        // 🚀 核心啟動程序 (使用 DOMContentLoaded 保證秒載入不凍結)
+        // 安全直接啟動程序 (立即執行)
         // ------------------------------------------
-        document.addEventListener('DOMContentLoaded', () => {
+        function initApp() {
             try {
                 HomeModule.init();
                 TripModule.init(); 
@@ -1132,7 +1256,10 @@
             } catch (err) { 
                 console.error("系統啟動發生錯誤:", err); 
             }
-        });
+        }
+        
+        document.addEventListener('DOMContentLoaded', initApp);
+        
     </script>
 </body>
 </html>
